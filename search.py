@@ -6,12 +6,12 @@ from data_validation import input_form
 def q_get_tuple(cursor, query):
     cursor.execute(query)
     for i in cursor:
-        return i
+        return check_exists(i)
 def q_get_list_of_tuples(cursor, query):
     list = []
     for i in cursor:
         list.append(i)
-    return list
+    return check_exists(list)
 
 # Searches for ingredient by name or by specific nid (if not, None), returns nutritional info
 # cursor, nutrient_id/None -> [nutrient_id, nutrient_name, units]
@@ -90,7 +90,8 @@ def search_nutrient_data(cursor, food_id, nutrient_id):
         query = "select nutrient_id, amt, food_id from nutrient_data where food_id = " + qform_varchar(food_id) + " and nutrient_id = " + qform_varchar(nutrient_id) + ""
         return q_get_tuple(cursor, query)
 
-#cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]
+# Returns none if there are no meals
+#cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
 def search_meal(cursor, recipe_id, plan_id):
     output_fields = "recipe_id, plan_id, num_servings"
     table = "meal"
@@ -137,3 +138,9 @@ def search(cursor, dialogue, allCols, table, name_Col, id_Col):
         return search(cursor, dialogue, allCols, table, name_Col, id_Col)
 
 
+#returns list if empty, returns None if not empty
+def check_exists(list):
+    if (len(list) == 0):
+        return None
+    else:
+        return list

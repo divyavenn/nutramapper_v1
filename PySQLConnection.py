@@ -26,12 +26,6 @@ def change_plan_days(cursor, plan_id):
     days = get_days("What number of days should his plan cover?")
     query = "update plan set num_days = " + str(days) + "where plan_id = " + str(plan_id)
 
-def remove_meal(cursor, plan_id, recipe_id):
-    if recipe_id is None:
-        recipe_item = search_recipe(cursor, None)
-        recipe_id = recipe_item[0]
-    query = ("delete from meal where recipe_id =" + str(recipe_id) + " and plan_id = " + str(plan_id))
-    cursor.execute(query)
 def rename_plan(cursor, plan_id):
     new_name = input("Enter a new name for the recipe:")
     if not(input_form(new_name) == 0):
@@ -40,25 +34,6 @@ def rename_plan(cursor, plan_id):
     else:
         query = "update recipe set plan_name = " + "'" + new_name + "'" + "where plan_id = " + str(plan_id)
         cursor.execute(query)
-
-def part_of_plan(cursor,recipe_id, plan_id):
-    query = "select * from meal where recipe_id = " + str(recipe_id) + " and plan_id = " + str(plan_id)
-    cursor.execute(query)
-    if ((len(cursor)) == 0):
-        return False
-    else:
-        return True
-def alter_meal(cursor, plan_id):
-    recipe = search_recipe(cursor, None)
-    recipe_id = recipe[0]
-    if (part_of_plan(cursor, recipe_id, plan_id)):
-        new_amt = input('What would you like to change the number of servings to?')
-        query = "update meal set num_servings =  " + str(new_amt) + "where recipe_id = " + str(recipe_id) + "and plan_id = " + str(plan_id)
-        cursor.execute(query)
-    else:
-        ans = input("Would you like to add this recipe to the plan? [Y/N]")
-        if (ans == "Y"):
-            add_meal(cursor, plan_id, recipe_id)
 
 
 def view_plan_list(cursor):

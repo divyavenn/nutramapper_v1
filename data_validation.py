@@ -33,5 +33,5 @@ def get_number(str):
     while not(input_form(num) == 1):
         print("That's not a valid number. Try again.")
         return get_number(str)
-    return number
+    return num
 

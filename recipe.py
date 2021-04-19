@@ -1,4 +1,4 @@
-from ingredient import print_ingredient, add_ingredient
+from ingredient import add_ingredient
 from search import search_recipe, search_ingredient
 from nutrient import get_nutrients_to_track, get_nutrient_amount
 from data_validation import input_form,qform_varchar,qform_num

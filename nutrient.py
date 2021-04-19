@@ -1,7 +1,7 @@
 
 from data_validation import qform_varchar, qform_num
 from search import search_nutrient, search_nutrient_data
-
+from print_methods import print_nutrient
 
 #NUTRIENT DATA: [nutrient id, amt, food_id]
 #DAILY_REQS: [nutrient_id, nutrient name, daily requirement, units]

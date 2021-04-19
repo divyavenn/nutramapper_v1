@@ -2,6 +2,7 @@ from search import search_food_item, search_ingredient, search_recipe, q_get_tup
 from recipe import nutritional_total_recipe
 from meal import recipe_id_meal
 from data_validation import qform_varchar, qform_num
+
 # pretty-prints single nutrient
 # [nutrient_id, nutrient_name, units] -> None
 def print_nutrient(n):
