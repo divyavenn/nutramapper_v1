@@ -36,10 +36,9 @@ def search(cursor, dialogue, allCols, table, name_Col, id_Col):
         query = "select " + allCols + " from " + table + " where " + name_Col + " like '" + x + "%'"
         if (cursor.execute(query) == 1):
             for i in cursor:
-                print(i)
                 return i
         else:
-            print("Not an exact match. Did you mean one of these?")
+            print("Not an exact match. Any similar matches are printed below")
             for i in cursor:
                 print(i)
             return search(cursor, dialogue, allCols, table, name_Col, id_Col)
@@ -51,6 +50,8 @@ def search(cursor, dialogue, allCols, table, name_Col, id_Col):
         else:
             print("Invalid ID.")
             return search(cursor, dialogue, allCols, table, name_Col, id_Col)
+    else:
+        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
 
 
 # Searches for ingredient by name or by specific nid, returns nutritional info
@@ -98,13 +99,11 @@ def search_plan(cursor, plan_id):
     table = "plan"
     if (plan_id is None):
         x = search(cursor, "Enter a plan", output_fields, table, "plan_name", "plan_id")
-        print(x)
+        return(x)
     else:
         cursor.execute("select " + output_fields + " from " + table + " where plan_id = " + (plan_id))
         for i in cursor:
             return i
-
-
 # -----------------------------------------------------NUTRIENT FUNCTIONS-----------------------------------------------
 
 # gets amount of (inp)nutrient in (inp)food item
