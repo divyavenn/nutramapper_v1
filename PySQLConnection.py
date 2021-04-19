@@ -1,69 +1,7 @@
 
 import pymysql
-import string
-
-#---------------------------------------------------INPUT PARSING-----------------------------------------------------
-#returns -2 for empty input, -1 for invalid input, 0 for name, 1 for id
-def input_form(str):
-    name = set(string.ascii_lowercase + string.ascii_uppercase + ',' + string.digits + '%' + '(' + ')' + '-' + ' ')
-    id = set(string.digits)
-    if len(str) == 0:
-        return -2
-    elif all(letter in id for letter in str):
-        return 1
-    elif all(letter in name for letter in str):
-        return 0
-    else:
-        return -1
-# --------------------------------------------------CURSOR FUNCTIONS--------------------------------------------------
-def get_only_result(cursor, query):
-    cursor.execute(query)
-    for i in cursor:
-        return i;
-
-
+from data_validation import input_form
 # --------------------------------------------------SEARCH BY NAME FUNCTIONS-------------------------------------------------
-def search(cursor, dialogue, allCols, table, name_Col, id_Col):
-    x = input(dialogue + "\n")
-    form = input_form(x)
-    if (form == -2):
-        print("You did not not type anything")
-        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
-    elif (form == -1):
-        print("Invalid input")
-        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
-    elif(form == 0):
-        query = "select " + allCols + " from " + table + " where " + name_Col + " like '" + x + "%'"
-        if (cursor.execute(query) == 1):
-            for i in cursor:
-                return i
-        else:
-            print("Not an exact match. Any similar matches are printed below")
-            for i in cursor:
-                print(i)
-            return search(cursor, dialogue, allCols, table, name_Col, id_Col)
-    elif(form == 1):
-        query = "select " + allCols + " from " + table + " where " + id_Col + " = " + x + ""
-        if (cursor.execute(query) == 1):
-            for i in cursor:
-                return i
-        else:
-            print("Invalid ID.")
-            return search(cursor, dialogue, allCols, table, name_Col, id_Col)
-    else:
-        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
-
-
-# Searches for ingredient by name or by specific nid, returns nutritional info
-def search_nutrient(cursor, nid):
-    x = []
-    if (nid == None):
-        x = search(cursor, "Enter a nutrient", "nutrient_id, nutrient_name, units", "nutrient", "nutrient_name", "nutrient_id")
-    else:
-        cursor.execute("select nutrient_id, nutrient_name, units from nutrient where nutrient_id = " + nid)
-        for i in cursor:
-            x = i
-    return x;
 
 
 # Searches for ingredient by name or through specific (inp)food-id
@@ -105,73 +43,6 @@ def search_plan(cursor, plan_id):
         for i in cursor:
             return i
 # -----------------------------------------------------NUTRIENT FUNCTIONS-----------------------------------------------
-
-# gets amount of (inp)nutrient in (inp)food item
-# returns integer: amount
-def get_nutrient_amount(cursor, food_id, nutrient_id):
-    x = []
-    cursor.execute("select nutrient_id, amt, food_id from nutrient_data where food_id = '" + str(food_id) + "' and nutrient_id = '" + str(nutrient_id) + "'")
-    for i in cursor:
-        x = i
-    if (len(x) == 0):
-        return 0
-    else:
-        return x[1]
-
-def print_nutrient_info(nutrientList):
-    for n in nutrientList:
-        print(n)
-
-def get_nutrients_to_track(cursor):
-    nutr_to_track = []
-    cursor.execute('select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n')
-    for i in cursor:
-        nutr_to_track.append(i)
-    return nutr_to_track
-
-def is_part_of_nutrients_to_track(cursor, nutrient):
-    nttList = get_nutrients_to_track(cursor)
-    return (nutrient[0] in (i[0] for i in nttList))
-
-def update_nutrients_to_track(cursor, nid):
-    x = search_nutrient(cursor, nid)
-    is_part = is_part_of_nutrients_to_track(cursor, x)
-    # Nutrient is indeed part of list; can update
-    if (is_part):
-        r = input("How many " + x[2] + " would you like to consume daily, on average?")
-        query = "update daily_nut_requ set requ = 13.5 where nutrient_id = '" + r + "'"
-        cursor.execute(query)
-    else:
-        print("That nutrient is not part of the daily requirements.\n")
-        print(x)
-        choice = input("Would you like to add it? [Y/N] \n")
-        if (choice == 'Y'):
-            add_nutrients_to_track(cursor, x[0])
-        # Nutrient is not part of list; must add
-
-
-def add_nutrients_to_track(cursor, nid):
-    x = search_nutrient(cursor, nid)
-    is_part = is_part_of_nutrients_to_track(cursor, x)
-    if (is_part):
-        print("That nutrient is already part of the daily requirements.\n")
-        print(x)
-        choice = input("Would you like to update it? [Y/N] \n")
-        if (choice == 'Y'):
-            update_nutrients_to_track(cursor, x[0])
-    else:
-        r = input("How many " + x[2] + " would you like to consume daily, on average?")
-        cursor.execute("insert into daily_nut_requ (nutrient_id, requ) values (" + str(x[0]) + "," + str(r) + ")")
-def remove_nutrients_to_track(cursor):
-    nutr_to_track = get_nutrients_to_track(cursor)
-    print_nutrient_info(nutr_to_track)
-    x = search_nutrient(cursor, None)
-    is_part = is_part_of_nutrients_to_track(cursor, x)
-    if is_part:
-        cursor.execute("delete from daily_nut_requ where nutrient_id = " + str(x[0]) + "")
-    else:
-        print("Nutrient is already not part of tracked requirements. \n")
-
 #--------------------------------------------------------------INGREDIENT FUNCTIONS--------------------------------------------------
 def add_ingredient(cursor, recipe_id, food_id):
     if food_id is None:
@@ -288,20 +159,30 @@ def delete_recipe(cursor, recipe_id):
 
 
 #---------------------------------------------------------------PLAN FUNCTIONS--------------------------------------------------------
-def add_plan(cursor):
-    name = input("What is the name of this plan?")
-    if not (input_form(name) == 0):
+def get_name(str):
+    name = input(str)
+    while not(input_form(name) == 0):
         print("That's not a valid name. Try again.")
-        add_plan(cursor)
-    else:
-        cursor.execute('insert into plan (plan_name) values ( "' + name + ' ")')
-        plan_id = None
-        # find recipe_id of new plan
-        cursor.execute("select plan_id from plan where (plan_name = '" + name + "')")
-        for i in cursor:
-            plan_id = i[0]
-        while (input("Would you like to add a recipe [Y/N]") == "Y"):
-            add_meal(cursor, plan_id, None)
+        return get_name(str)
+    return name
+def get_days(str):
+    days = input(str)
+    while not(input_form(name) == 1):
+        print("That's not a valid number. Try again.")
+        return get_days(str)
+    return days
+def add_plan(cursor):
+    name = get_name("What is the name of this plan?")
+    days = get_days("How many days does this meal plan cover?")
+
+    cursor.execute('insert into plan (plan_name, num_days) values ( "' + name + "', " + str(days) + ")")
+    plan_id = None
+    # find recipe_id of new plan
+    cursor.execute("select plan_id from plan where (plan_name = '" + name + "')")
+    for i in cursor:
+        plan_id = i[0]
+    while (input("Would you like to add a recipe [Y/N]") == "Y"):
+        add_meal(cursor, plan_id, None)
 def remove_plan(cursor, plan_id):
     query = "delete from plan where plan_id = " + str(plan_id)
     cursor.execute(query)
@@ -321,6 +202,9 @@ def add_meal(cursor, plan_id, recipe_id):
         print("Please enter a numeric input:")
         add_meal(cursor, plan_id, recipe_id)
 
+def change_plan_days(cursor, plan_id):
+    days = get_days("What number of days should his plan cover?")
+    query = "update plan set num_days = " + str(days) + "where plan_id = " + str(plan_id)
 
 def remove_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
@@ -355,6 +239,78 @@ def alter_meal(cursor, plan_id):
         ans = input("Would you like to add this recipe to the plan? [Y/N]")
         if (ans == "Y"):
             add_meal(cursor, plan_id, recipe_id)
+
+
+def view_plan_list(cursor):
+    print("PLAN LIST")
+    query = "select plan_name from plan"
+    cursor.execute(query)
+    plans = []
+    for p in cursor:
+        print(p[0])
+        plans.append(p)
+    if (len(plans) == 0):
+        return False
+    else:
+        return True
+
+def print_meal(cursor, meal):
+    cursor.execute("select recipe_name from recipe where recipe_id = " + str(meal[1]))
+    recipe_name = ""
+    for i in cursor:
+        recipe_name = i[0]
+
+    print(str(meal[2]) + " servings of " + recipe_name)
+
+def get_meals_in_plan(cursor, plan_id):
+    meals = []
+    query = "select * from meal where plan_id = " + str(plan_id)
+    cursor.execute(query)
+    for i in cursor:
+        meals.append(i)
+    if (len(meals) == 0):
+        print("There aren't any meals in this plan.")
+        return None
+    return meals
+def view_plan(cursor, plan_id):
+    meals = get_meals_in_plan(cursor, plan-id)
+    if not meals is None:
+        print("This plan has: \n")
+        for m in meals:
+            print_meal(cursor, m)
+    fulfills_nutritional_reqs(cursor, plan_id)
+
+def get_num_days(cursor, plan_id):
+    query = "select num_days from plan where plan_id = " + str(plan_id)
+    cursor.execute(query)
+    for i in cursor:
+        return i[0]
+
+def fulfills_nutritional_reqs(cursor, plan_id):
+    meals = get_meals_in_plan()
+    if not meals is None:
+        daily_reqs = []
+        nutrients = get_nutrients_to_track(cursor)
+        for n in nutrients:
+            daily_reqs.append(n[2])
+        recipe_totals = []
+        planwide_avg = []
+        num_days = get_num_days(cursor, plan_id)
+        for m in meals:
+            recipe_id = m[0]
+            recipe_totals.append(nutritional_total_recipe(cursor, recipe_id))
+        for i in range(0,len(daily_reqs)):
+            sum = 0
+            for r in recipe_totals:
+                sum = sum + r[i]
+            planwide_avg[i] = sum/num_days
+            if planwide_avg[i] < daily_reqs[i]:
+                diff = daily_reqs[i] - planwide_avg[i]
+                print("You miss your goal for " + nutrients[i][2] + " by an average of: \n" + str(diff) + " " + nutrients[i][3] + " per day.")
+            elif planwide_avg[i] > daily_reqs[i]:
+                surplus = planwide_avg[i] - daily_reqs[i]
+                print("You exceed your goal for " + nutrients[i][2] + " by an average of: \n" + str(surplus) + " " + nutrients[i][3] + " per day.")
+
 
 # --------------------------------------------------------------MENU FUNCTIONS--------------------------------------------------------------------
 def print_menu(options):
@@ -480,7 +436,7 @@ def recipe_menu(connection):
     elif (choice == 3):
         main_menu(connection)
 
-def plan_update_menu(connection, plan_id):
+def plan_update_menu(cursor, plan_id):
     options = ['Add Meal',
                'Remove Meal',
                'Alter number of servings',
@@ -488,63 +444,27 @@ def plan_update_menu(connection, plan_id):
                'Delete Plan',
                'Return to Main Menu']
 
-def view_plan_list(cursor):
-    print("PLAN LIST")
-    query = "select plan_name from plan"
-    cursor.execute(query)
-    plans = []
-    for p in cursor:
-        print(p[0])
-        plans.append(p)
-    if (len(plans) == 0):
-        return False
-    else:
-        return True
-
-def print_meal(cursor, meal):
-    cursor.execute("select recipe_name from recipe where recipe_id = " + str(meal[1]))
-    recipe_name = ""
-    for i in cursor:
-        recipe_name = i[0]
-
-    print(str(meal[2]) + " servings of " + recipe_name)
-
-def view_plan(cursor, plan_id):
-    meals = []
-    query = "select * from meal where plan_id = " + str(plan_id)
-    cursor.execute(query)
-    for i in cursor:
-        meals.append(i)
-    if (len(meals) == 0):
-        if (input("There aren't any meals in this plan. Would you like to add one?[Y/N]") == "Y"):
-            add_meal(cursor, plan_id, None)
-    else:
-        print("This plan has: \n")
-        for m in meals:
-            print_meal(cursor, m)
-
-def plan_menu(connection):
-    cursor = connection.cursor()
-    options = ['View/Update Meal Plan',
+def plan_menu(cursor, choice):
+    if (choice is None):
+        options = ['View/Update Meal Plan',
               'Create New Meal Plan',
                'Return To Main Menu']
-    choice = make_menu(options)
+        choice = make_menu(options)
     if (choice == 1):
         if (view_plan_list(cursor) == False):
             if (input("There aren't any meal plans. Would you like to add one? [Y/N]") == "Y"):
                 add_plan(cursor)
-                connection.commit()
         else:
             plan = search_plan(cursor, None)
             view_plan(cursor, plan[0])
-            plan_update_menu(connection, plan[0])
+            plan_update_menu(cursor, plan[0])
             connection.commit()
-        plan_menu(connection)
+        plan_menu(cursor, None)
     elif (choice == 2):
         add_plan(cursor)
-        plan_menu(connection)
+        plan_menu(cursor, None)
     elif (choice == 3):
-        main_menu(connection)
+        main_menu(cursor)
 
 def main_menu(connection):
     cursor = connection.cursor()
@@ -564,18 +484,19 @@ def main_menu(connection):
 
 
 # -----------------------------------------------------------------MAIN--------------------------------------------------------------------
-print('Hi!')
-connection = pymysql.connect(host='localhost',
+
+"""connection = pymysql.connect(host='localhost',
                              port=3306,
                              user='root',
                              password='0926',
                              db='meal_plan',
-                             charset='utf8mb4')
-main_menu(connection)
-connection.commit()
-print("Closing connection to database...\n")
-connection.close()
-print("Goodbye!\n")
+                             charset='utf8mb4')"""
+
+#main_menu(connection)
+#connection.commit()
+#print("Closing connection to database...\n")
+#connection.close()
+#print("Goodbye!\n")
 
 
 

@@ -51,6 +51,7 @@ drop table if exists plan;
 create table plan(
 	plan_id int  not null auto_increment,
     plan_name varchar(300) not null, 
+    num_days double not null,
     constraint plan_pk primary key 
 		(plan_id));
 
@@ -81,6 +82,7 @@ create table meal(
 	plan_id int not null,
     recipe_id int not null,
     num_servings double not null, 
+    constraint meal_pk primary key (plan_id, recipe_id),
     constraint part_of_plan foreign key (plan_id)
 		references plan(plan_id)
         on delete cascade
@@ -135,7 +137,7 @@ insert into ingredient (food_id, recipe_id, amount_in_grams) values ('20091', @c
 insert into ingredient (food_id, recipe_id, amount_in_grams) values ('11215', @cc_pasta_id , 30);
 
 /*Plans */
-insert into plan(plan_name) values ('week 1');
+insert into plan(plan_name, num_days) values ('week 1', 7);
 set @w1_id = (select plan_id from plan where (plan_name = 'week 1'));
 insert into meal (plan_id, recipe_id, num_servings) values (@w1_id, @cc_pasta_id, 2);
 insert into meal (plan_id, recipe_id, num_servings) values (@w1_id, @apb_id, 4);
