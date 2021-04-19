@@ -5,7 +5,7 @@ import string
 #---------------------------------------------------INPUT PARSING-----------------------------------------------------
 #returns -2 for empty input, -1 for invalid input, 0 for name, 1 for id
 def input_form(str):
-    name = set(string.ascii_letters + ',' + string.digits + '%' + '(' + ')' + '-' + '')
+    name = set(string.ascii_lowercase + string.ascii_uppercase + ',' + string.digits + '%' + '(' + ')' + '-' + ' ')
     id = set(string.digits)
     if len(str) == 0:
         return -2
@@ -112,6 +112,7 @@ def search_plan(cursor, plan_id):
 # gets amount of (inp)nutrient in (inp)food item
 # returns integer: amount
 def get_nutrient_amount(cursor, food_id, nutrient_id):
+    x = []
     cursor.execute("select nutrient_id, amt, food_id from nutrient_data where food_id = '" + str(food_id) + "' and nutrient_id = '" + str(nutrient_id) + "'")
     for i in cursor:
         x = i
@@ -219,9 +220,7 @@ def get_recipe_ingredients(cursor, recipe_id):
 
 def nutritional_total_recipe(cursor, recipe_id):
     nutr_reqs = get_nutrients_to_track(cursor)
-    print(nutr_reqs)
     food_items_in_recipe = get_recipe_ingredients(cursor, recipe_id)
-    print(food_items_in_recipe)
     nutr_totals = []
     for nutrient in nutr_reqs:
         total = 0
@@ -234,14 +233,18 @@ def nutritional_total_recipe(cursor, recipe_id):
 
 def add_recipe(cursor):
     name = input("What is the name of this recipe?")
-    cursor.execute('insert into recipe (recipe_name) values ( "' + name + ' ")')
-    recipe_id = None
-    # find recipe_id of new recipe
-    cursor.execute("select recipe_id from recipe where (recipe_name = '" + name + "')")
-    for i in cursor:
-        recipe_id = i[0]
-    while (input("Would you like to add an ingredient [Y/N]") == "Y"):
-        add_ingredient(cursor, recipe_id, None)
+    if not (input_form(name) == 0):
+        print("That's not a valid recipe name. Try again.")
+        add_recipe(cursor)
+    else:
+        cursor.execute('insert into recipe (recipe_name) values ( "' + name + ' ")')
+        recipe_id = None
+        # find recipe_id of new recipe
+        cursor.execute("select recipe_id from recipe where (recipe_name = '" + name + "')")
+        for i in cursor:
+            recipe_id = i[0]
+        while (input("Would you like to add an ingredient [Y/N]") == "Y"):
+            add_ingredient(cursor, recipe_id, None)
 
 def view_recipe(cursor, recipe_id):
     recipe = search_recipe(cursor, recipe_id)
@@ -258,7 +261,7 @@ def view_recipe(cursor, recipe_id):
     print("Nutritional Info:")
     nutr_totals = nutritional_total_recipe(cursor, recipe_id)
     for i in nutr_totals:
-        print(i)
+        print(i[1] + ": " + str(i[2]) + " " + i[3])
 
 def view_recipe_list(cursor):
     print("RECIPE INDEX")
@@ -266,7 +269,7 @@ def view_recipe_list(cursor):
     cursor.execute(query)
     recipes = []
     for r in cursor:
-        print(r)
+        print(r[0])
         recipes.append(r)
     if (len(recipes) == 0):
         return False
@@ -274,10 +277,87 @@ def view_recipe_list(cursor):
         return True
 def rename_recipe(cursor, recipe_id):
     new_name = input("Enter a new name for the recipe:")
-    query = "update recipe set recipe_name = " + "'new_name'" + "where recipe_id = " + str(recipe_id)
+    if not(input_form(new_name) == 0):
+        print("That's not a valid recipe name. Try again.")
+        rename_recipe(cursor, recipe_id)
+    else:
+        query = "update recipe set recipe_name = " + "'" + new_name + "'" + "where recipe_id = " + str(recipe_id)
+        cursor.execute(query)
+
+
 def delete_recipe(cursor, recipe_id):
     query = "delete from recipe where recipe_id = " + str(recipe_id)
     cursor.execute(query)
+
+
+#---------------------------------------------------------------PLAN FUNCTIONS--------------------------------------------------------
+def add_plan(cursor):
+    name = input("What is the name of this plan?")
+    if not (input_form(name) == 0):
+        print("That's not a valid name. Try again.")
+        add_plan(cursor)
+    else:
+        cursor.execute('insert into plan (plan_name) values ( "' + name + ' ")')
+        plan_id = None
+        # find recipe_id of new plan
+        cursor.execute("select plan_id from plan where (plan_name = '" + name + "')")
+        for i in cursor:
+            plan_id = i[0]
+        while (input("Would you like to add a recipe [Y/N]") == "Y"):
+            add_meal(cursor, plan_id, None)
+def remove_plan(cursor, plan_id):
+    query = "delete from plan where plan_id = " + str(plan_id)
+    cursor.execute(query)
+def add_meal(cursor, plan_id, recipe_id):
+    if recipe_id is None:
+        recipe_item = search_recipe(cursor, None)
+        recipe_id = recipe_item[0]
+    amount = input("How many servings of this item would you like to add?")
+    if(input_form(amount)==1):
+        query = ("insert into meal (recipe_id, plan_id, num_servings) values ("
+                 + str(recipe_id) + ","
+                + str(plan_id) + ","
+                + str(amount) + ")")
+        cursor.execute(query)
+    else:
+        print("Please enter a numeric input:")
+        add_meal(cursor, plan_id, recipe_id)
+
+
+def remove_meal(cursor, plan_id, recipe_id):
+    if recipe_id is None:
+        recipe_item = search_recipe(cursor, None)
+        recipe_id = recipe_item[0]
+    query = ("delete from meal where recipe_id =" + str(recipe_id) + " and plan_id = " + str(plan_id))
+    cursor.execute(query)
+def rename_plan(cursor, plan_id):
+    new_name = input("Enter a new name for the recipe:")
+    if not(input_form(new_name) == 0):
+        print("That's not a valid plan name. Try again.")
+        rename_plan(cursor, plan_id)
+    else:
+        query = "update recipe set plan_name = " + "'" + new_name + "'" + "where plan_id = " + str(plan_id)
+        cursor.execute(query)
+
+def is_part_of_plan(cursor,recipe_id, plan_id):
+    query = "select * from meal where recipe_id = " + str(recipe_id) + " and plan_id = " + str(plan_id)
+    cursor.execute(query)
+    if ((len(cursor)) == 0):
+        return False
+    else:
+        return True
+def alter_meal(cursor, plan_id):
+    recipe = search_recipe(cursor, None)
+    recipe_id = recipe[0]
+    if (part_of_plan(cursor, recipe_id, plan_id)):
+        new_amt = input('What would you like to change the number of servings to?')
+        query = "update meal set num_servings =  " + str(new_amt) + "where recipe_id = " + str(recipe_id) + "and plan_id = " + str(plan_id)
+        cursor.execute(query)
+    else:
+        ans = input("Would you like to add this recipe to the plan? [Y/N]")
+        if (ans == "Y"):
+            add_meal(cursor, plan_id, recipe_id)
+
 # --------------------------------------------------------------MENU FUNCTIONS--------------------------------------------------------------------
 def print_menu(options):
     print(30 * "-" + "MENU" + 30 * "-" + "")
@@ -350,22 +430,32 @@ def recipe_update_menu(connection, recipe_id):
     cursor = connection.cursor
     x = input("Would you like to update this recipe? [Y/N]")
     if (x == "Y"):
-        options = ['Alter Ingredient Quantity', 'Add Ingredient', 'Remove Ingredient', 'Return to Main Menu']
+        options = ['Alter Ingredient Quantity',
+                   'Add Ingredient',
+                   'Remove Ingredient',
+                   'Rename Recipe',
+                   'Delete Recipe',
+                   'Return to Main Menu']
         choice = make_menu(options)
         if (choice == 1):
             alter_ingredient(cursor, recipe_id)
             connection.commit()
             recipe_update_menu(connection)
         elif(choice == 2):
-            food = search_food_item(cursor, None)
-            add_ingredient(cursor, recipe_id, food[0])
+            add_ingredient(cursor, recipe_id, None)
             connection.commit()
             recipe_update_menu(connection)
         elif(choice==3):
             remove_ingredient(cursor, recipe_id)
             connection.commit()
             recipe_update_menu(connection)
-        elif(choice==4):
+        elif (choice == 4):
+            rename_recipe(cursor, recipe_id)
+            connection.commit()
+        elif (choice==5):
+            delete_recipe(cursor, recipe_id)
+            connection.commit()
+        elif(choice==6):
             main_menu(connection)
 def recipe_menu(connection):
     cursor = connection.cursor()
@@ -391,6 +481,41 @@ def recipe_menu(connection):
         recipe_menu(connection)
     elif (choice == 3):
         main_menu(connection)
+
+def plan_update_menu(connection, plan_id):
+    options = ['Add Meal',
+               'Remove Meal',
+               'Alter number of servings',
+               'Rename Plan',
+               'Delete Plan',
+               'Return to Main Menu']
+
+def view_plan_list(cursor):
+    print("PLAN LIST")
+    query = "select plan_name from plan"
+    cursor.execute(query)
+    plans = []
+    for p in cursor:
+        print(p[0])
+        plans.append(p)
+    if (len(plans) == 0):
+        return False
+    else:
+        return True
+def view_plan(cursor, plan_id):
+    meals = []
+    query = "select * from meal where plan_id = " + str(plan_id)
+    cursor.execute(query)
+    for i in cursor:
+        meals.append[i]
+    if (len(meals) == 0):
+        if (input("There aren't any meals in this plan. Would you like to add one?[Y/N]") == "Y"):
+            add_meal(cursor, plan_id, None)
+    else:
+        print("This plan has: \n")
+        for m in meals:
+            print(str(m[1]) + " servings of " + m[0])
+
 def plan_menu(connection):
     cursor = connection.cursor()
     options = ['View/Update Meal Plan',
@@ -398,11 +523,19 @@ def plan_menu(connection):
                'Return To Main Menu']
     choice = make_menu(options)
     if (choice == 1):
-        print("View/update meal plan")
-        recipe_menu(connection)
+        if (view_plan_list(cursor) == False):
+            if (input("There aren't any meal plans. Would you like to add one? [Y/N]") == "Y"):
+                add_plan(cursor)
+                connection.commit()
+        else:
+            plan = search_plan(cursor, None)
+            view_plan(cursor, plan[0])
+            plan_update_menu(connection, plan[0])
+            connection.commit()
+        plan_menu(connection)
     elif (choice == 2):
-        print('create new meal plan')
-        recipe_menu(connection)
+        add_plan(cursor)
+        plan_menu(connection)
     elif (choice == 3):
         main_menu(connection)
 
@@ -436,7 +569,6 @@ connection.commit()
 print("Closing connection to database...\n")
 connection.close()
 print("Goodbye!\n")
-
 
 
 

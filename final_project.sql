@@ -94,14 +94,14 @@ create table meal(
 
 insert into recipe (recipe_name) values ('panini');
 set @panini_id = (select recipe_id from recipe where (recipe_name = 'panini'));
-insert into ingredient (food_id, recipe_id, amount_in_grams) values ('02044', @panini_id , 100);
-insert into ingredient (food_id, recipe_id, amount_in_grams) values ('02047', @panini_id , 100);
+insert into ingredient (food_id, recipe_id, amount_in_grams) values ('02044', @panini_id , 5);
+insert into ingredient (food_id, recipe_id, amount_in_grams) values ('02047', @panini_id , 5);
 insert into ingredient (food_id, recipe_id, amount_in_grams) values ('11529', @panini_id , 100);
 insert into ingredient (food_id, recipe_id, amount_in_grams) values ('18060', @panini_id , 100);
-
+insert into ingredient (food_id, recipe_id, amount_in_grams) values ('01026', @panini_id , 50);
 
 insert into daily_nut_requ (nutrient_id, requ) values ('326', 1000);
 insert into daily_nut_requ (nutrient_id, requ) values ('303', 14.8);
 insert into daily_nut_requ (nutrient_id, requ) values ('309', 8);
 insert into daily_nut_requ (nutrient_id, requ) values ('401', 90);
-
+insert into daily_nut_requ (nutrient_id, requ) values ('430', 50);
