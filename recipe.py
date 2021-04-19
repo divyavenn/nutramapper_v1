@@ -40,39 +40,6 @@ def add_recipe(cursor):
         while (input("Would you like to add an ingredient [Y/N]") == "Y"):
             add_ingredient(cursor, recipe_id, None)
 
-#pretty prints recipe
-#print_recipe(cursor, recipe_id) -> None
-def print_recipe(cursor, recipe_id):
-    recipe = search_recipe(cursor, recipe_id)
-    recipe_id = recipe[0]
-    name = recipe[1]
-    ingredients = search_ingredient(cursor, None, recipe_id)
-    print(name)
-    for i in ingredients:
-        print_ingredient(cursor, i)
-    print("Nutritional Info:")
-    nutr_totals = nutritional_total_recipe(cursor, recipe_id)
-    for i in nutr_totals:
-        print(i[1] + ": " + str(i[2]) + " " + i[3])
-
-
-
-#prints recipe list and returns if there are any recipes
-# cursor -> boolean
-def print_recipe_list(cursor):
-    print("RECIPE INDEX")
-    query = "select recipe_name from recipe"
-    cursor.execute(query)
-    recipes = []
-    for r in cursor:
-        print(r[0])
-        recipes.append(r)
-    if (len(recipes) == 0):
-        return False
-    else:
-        return True
-
-
 
 # rename_recipe(cursor, recipe_id) -> None
 def rename_recipe(cursor, recipe_id):

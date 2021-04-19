@@ -4,18 +4,7 @@ from data_validation import input_form
 
 
 #---------------------------------------------------------------PLAN FUNCTIONS--------------------------------------------------------
-def get_name(str):
-    name = input(str)
-    while not(input_form(name) == 0):
-        print("That's not a valid name. Try again.")
-        return get_name(str)
-    return name
-def get_days(str):
-    days = input(str)
-    while not(input_form(name) == 1):
-        print("That's not a valid number. Try again.")
-        return get_days(str)
-    return days
+
 def add_plan(cursor):
     name = get_name("What is the name of this plan?")
     days = get_days("How many days does this meal plan cover?")
@@ -31,21 +20,7 @@ def add_plan(cursor):
 def remove_plan(cursor, plan_id):
     query = "delete from plan where plan_id = " + str(plan_id)
     cursor.execute(query)
-def add_meal(cursor, plan_id, recipe_id):
-    if recipe_id is None:
-        recipe_item = search_recipe(cursor, None)
-        print(recipe_item)
-        recipe_id = recipe_item[0]
-    amount = input("How many servings of this item would you like to add?")
-    if(input_form(amount)==1):
-        query = ("insert into meal (recipe_id, plan_id, num_servings) values ("
-                 + str(recipe_id) + ","
-                + str(plan_id) + ","
-                + str(amount) + ")")
-        cursor.execute(query)
-    else:
-        print("Please enter a numeric input:")
-        add_meal(cursor, plan_id, recipe_id)
+
 
 def change_plan_days(cursor, plan_id):
     days = get_days("What number of days should his plan cover?")
@@ -99,24 +74,7 @@ def view_plan_list(cursor):
     else:
         return True
 
-def print_meal(cursor, meal):
-    cursor.execute("select recipe_name from recipe where recipe_id = " + str(meal[1]))
-    recipe_name = ""
-    for i in cursor:
-        recipe_name = i[0]
 
-    print(str(meal[2]) + " servings of " + recipe_name)
-
-def get_meals_in_plan(cursor, plan_id):
-    meals = []
-    query = "select * from meal where plan_id = " + str(plan_id)
-    cursor.execute(query)
-    for i in cursor:
-        meals.append(i)
-    if (len(meals) == 0):
-        print("There aren't any meals in this plan.")
-        return None
-    return meals
 def view_plan(cursor, plan_id):
     meals = get_meals_in_plan(cursor, plan-id)
     if not meals is None:

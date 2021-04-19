@@ -17,12 +17,6 @@ def get_nutrient_amount(cursor, food_id, nutrient_id):
     else:
         return x[1]
 
-# pretty-prints single nutrient
-# [nutrient_id, nutrient_name, units] -> None
-def print_nutrient(n):
-    print("[ID " + str(n[0]) + "] : " + n[1] + " measured in " + n[2])
-
-
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None
 def print_nutrient_requ(n):

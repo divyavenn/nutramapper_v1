@@ -53,12 +53,3 @@ def alter_ingredient(cursor, recipe_id, food_id):
         if (ans == "Y"):
             add_ingredient(cursor, recipe_id, food_id)
 
-
-#pretty prints the ingredient
-#cursor, recipe_id, food_id -> None
-def print_ingredient(cursor, ingredient):
-    food_id = ingredient[0]
-    food_item = search_food_item(cursor, food_id)
-    food_name = food_item[1]
-    amount_in_grams = ingredient[1]
-    print("\t " + food_name + ": \n \t \t" + str(amount_in_grams) + " grams")
