@@ -28,30 +28,29 @@ def search(cursor, dialogue, allCols, table, name_Col, id_Col):
     form = input_form(x)
     if (form == -2):
         print("You did not not type anything")
-        search(cursor, dialogue, allCols, table, name_Col, id_Col)
+        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
     elif (form == -1):
         print("Invalid input")
-        search(cursor, dialogue, allCols, table, name_Col, id_Col)
+        return search(cursor, dialogue, allCols, table, name_Col, id_Col)
     elif(form == 0):
         query = "select " + allCols + " from " + table + " where " + name_Col + " like '" + x + "%'"
         if (cursor.execute(query) == 1):
             for i in cursor:
-                return i;
+                print(i)
+                return i
         else:
             print("Not an exact match. Did you mean one of these?")
             for i in cursor:
                 print(i)
-            search(cursor, dialogue, allCols, table, name_Col, id_Col)
+            return search(cursor, dialogue, allCols, table, name_Col, id_Col)
     elif(form == 1):
         query = "select " + allCols + " from " + table + " where " + id_Col + " = " + x + ""
         if (cursor.execute(query) == 1):
             for i in cursor:
-                return i;
+                return i
         else:
             print("Invalid ID.")
-            search(cursor, dialogue, allCols, table, name_Col, id_Col)
-    for i in cursor:
-        return i
+            return search(cursor, dialogue, allCols, table, name_Col, id_Col)
 
 
 # Searches for ingredient by name or by specific nid, returns nutritional info
@@ -95,16 +94,15 @@ def search_recipe(cursor, recipe_id):
 
 # Searches for recipe by name or through specific recipe-id
 def search_plan(cursor, plan_id):
-    x = []
     output_fields = "plan_id, plan_name"
     table = "plan"
     if (plan_id is None):
         x = search(cursor, "Enter a plan", output_fields, table, "plan_name", "plan_id")
+        print(x)
     else:
         cursor.execute("select " + output_fields + " from " + table + " where plan_id = " + (plan_id))
         for i in cursor:
-            x = i
-    return x;
+            return i
 
 
 # -----------------------------------------------------NUTRIENT FUNCTIONS-----------------------------------------------
@@ -311,6 +309,7 @@ def remove_plan(cursor, plan_id):
 def add_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         recipe_item = search_recipe(cursor, None)
+        print(recipe_item)
         recipe_id = recipe_item[0]
     amount = input("How many servings of this item would you like to add?")
     if(input_form(amount)==1):
@@ -339,7 +338,7 @@ def rename_plan(cursor, plan_id):
         query = "update recipe set plan_name = " + "'" + new_name + "'" + "where plan_id = " + str(plan_id)
         cursor.execute(query)
 
-def is_part_of_plan(cursor,recipe_id, plan_id):
+def part_of_plan(cursor,recipe_id, plan_id):
     query = "select * from meal where recipe_id = " + str(recipe_id) + " and plan_id = " + str(plan_id)
     cursor.execute(query)
     if ((len(cursor)) == 0):
@@ -502,19 +501,28 @@ def view_plan_list(cursor):
         return False
     else:
         return True
+
+def print_meal(cursor, meal):
+    cursor.execute("select recipe_name from recipe where recipe_id = " + str(meal[1]))
+    recipe_name = ""
+    for i in cursor:
+        recipe_name = i[0]
+
+    print(str(meal[2]) + " servings of " + recipe_name)
+
 def view_plan(cursor, plan_id):
     meals = []
     query = "select * from meal where plan_id = " + str(plan_id)
     cursor.execute(query)
     for i in cursor:
-        meals.append[i]
+        meals.append(i)
     if (len(meals) == 0):
         if (input("There aren't any meals in this plan. Would you like to add one?[Y/N]") == "Y"):
             add_meal(cursor, plan_id, None)
     else:
         print("This plan has: \n")
         for m in meals:
-            print(str(m[1]) + " servings of " + m[0])
+            print_meal(cursor, m)
 
 def plan_menu(connection):
     cursor = connection.cursor()
