@@ -24,14 +24,14 @@ def input_name(str):
     name = input(str)
     while not(input_form(name) == 0):
         print("That's not a valid name. Try again.")
-        return get_name(str)
+        return input_name(str)
     return name
 
 def input_number(str):
     num = input(str)
     while not(input_form(num) == 1):
         print("That's not a valid number. Try again.")
-        return get_number(str)
+        return input_number(str)
     return num
 
 def input_yes(str):

@@ -2,7 +2,6 @@
 
 # --------------------------------------------------------------MENU FUNCTIONS--------------------------------------------------------------------
 
-
 def food_item_menu(connection):
     cursor = connection.cursor()
     options = ['View Information For a Food Item',

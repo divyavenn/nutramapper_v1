@@ -1,7 +1,7 @@
 from ingredient import add_ingredient
-from search import search_recipe, search_ingredient
+from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples
 from nutrient import get_nutrients_to_track, get_nutrient_amount
-from data_validation import input_form,qform_varchar,qform_num
+from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
 
 #adds up the total amounts for each nutrient of each food item in a recipe
 #nutritional_total_recipe(cursor, recipe_id) -> [id, name, total_in_recipe, units]
@@ -26,30 +26,22 @@ def nutritional_total_recipe(cursor, recipe_id):
 # adds new recipe
 # cursor -> None
 def add_recipe(cursor):
-    name = input("What is the name of this recipe?")
-    if not (input_form(name) == 0):
-        print("That's not a valid recipe name. Try again.")
-        add_recipe(cursor)
-    else:
-        cursor.execute('insert into recipe (recipe_name) values ( "' + name + ' ")')
-        recipe_id = None
-        # find recipe_id of new recipe
-        cursor.execute("select recipe_id from recipe where (recipe_name = '" + name + "')")
-        for i in cursor:
-            recipe_id = i[0]
-        while (input("Would you like to add an ingredient [Y/N]") == "Y"):
-            add_ingredient(cursor, recipe_id, None)
+    name = input_name("What is the name of this recipe?")
+    query = "insert into recipe (recipe_name) values (" + qform_varchar(name) + ")"
+    cursor.execute(query)
+    recipe_id = None
+     # find recipe_id of new recipe
+    query = ("select recipe_id from recipe where (recipe_name = " + qform_varchar(name) + ")")
+    recipe_id = q_get_value(cursor, query, 0)
+    while (input("Would you like to add an ingredient [Y/N]") == "Y"):
+         add_ingredient(cursor, recipe_id, None)
 
 
 # rename_recipe(cursor, recipe_id) -> None
 def rename_recipe(cursor, recipe_id):
-    new_name = input("Enter a new name for the recipe:")
-    if not(input_form(new_name) == 0):
-        print("That's not a valid recipe name. Try again.")
-        rename_recipe(cursor, recipe_id)
-    else:
-        query = "update recipe set recipe_name = " + qform_num(new_name) + "where recipe_id = " + qform_num(recipe_id)
-        cursor.execute(query)
+    new_name = input_name("What is the name of this recipe?")
+    query = "update recipe set recipe_name = " + qform_num(new_name) + "where recipe_id = " + qform_num(recipe_id)
+    cursor.execute(query)
 
 # delete_recipe(cursor, recipe_id) -> None
 def delete_recipe(cursor, recipe_id):
