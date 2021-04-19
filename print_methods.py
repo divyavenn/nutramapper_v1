@@ -47,8 +47,7 @@ def print_ingredient(cursor, ingredient):
 
 #pretty prints recipe
 #print_recipe(cursor, recipe_id) -> None
-def print_recipe(cursor, recipe_id):
-    recipe = search_recipe(cursor, recipe_id)
+def print_recipe(cursor, recipe):
     recipe_id = recipe[0]
     name = recipe[1]
     ingredients = search_ingredient(cursor, None, recipe_id)
@@ -91,7 +90,7 @@ def print_plan(cursor, plan_id):
         print("This plan has: \n")
         for m in meals:
             print_meal(cursor, m)
-        fulfills_nutritional_reqs(cursor, plan_id)
+        fulfills_nutritional_requs(cursor, plan_id)
     else:
         print("This plan has no meals yet!")
 
