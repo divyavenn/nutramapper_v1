@@ -33,7 +33,7 @@ def search_nutrient(cursor, nid):
     return x
 
 # Searches for ingredient by name or through specific food-id
-# cursor, food_id/None -> [food_id, food_name, cost_per_100]
+# search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
 def search_food_item(cursor, food_id):
     x = []
     output_fields = "food_id, food_name, cost_per_100g"

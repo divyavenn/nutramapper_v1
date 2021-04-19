@@ -1,56 +1,7 @@
 
 
 # --------------------------------------------------------------MENU FUNCTIONS--------------------------------------------------------------------
-def print_menu(options):
-    print(30 * "-" + "MENU" + 30 * "-" + "")
-    i = 1
-    for opt in options:
-        opt_stmt = str(i) + ":" + opt + ""
-        print(opt_stmt)
-        i = i + 1
-    print(67 * "-" + "")
-    print("**Type 0 to end program.")
-def make_menu(opt):
-    loop = True
-    while loop:
-        print_menu(opt)
-        x = input("Enter your choice " + str(1) + " to " + str(len(opt)))
-        for i in range(1, len(opt ) +1):
-            if x == str(i):
-                return i
-        if x == str(0):
-            loop = False  # This will make the while loop to end as not value of loop is set to False
-        else:
-            # Any integer inputs other than values 1-5 we print an error message
-            print("Invalid option selection. \n")
 
-def nutrient_menu(connection):
-    cursor = connection.cursor()
-    options = ['View Nutrient Requirements',
-              'Add Nutrient Requirement to Track',
-              'Update Nutrient Requirement',
-              'Remove Nutrient Requirement Tracked',
-              'Return to Main Menu']
-    choice = make_menu(options)
-    if (choice == 1):
-        nutr_to_track = get_nutrients_to_track(cursor)
-        print("Nutrients that are currently being tracked: \n")
-        print_nutrient_info(nutr_to_track)
-        nutrient_menu(connection)
-    elif (choice == 2):
-        add_nutrients_to_track(cursor, None)
-        cursor.execute("commit")
-        nutrient_menu(connection)
-    elif (choice == 3):
-        update_nutrients_to_track(cursor, None)
-        connection.commit()
-        nutrient_menu(connection)
-    elif (choice == 4):
-        remove_nutrients_to_track(cursor)
-        connection.commit()
-        nutrient_menu(connection)
-    elif (choice == 5):
-        main_menu(connection)
 
 def food_item_menu(connection):
     cursor = connection.cursor()
@@ -154,21 +105,7 @@ def plan_menu(cursor, choice):
     elif (choice == 3):
         main_menu(cursor)
 
-def main_menu(connection):
-    cursor = connection.cursor()
-    options = ['View/Edit Tracked Nutrients',
-               'View/Edit Ingredients',
-               'View/Edit Recipes',
-               'View/Edit Plans']
-    choice = make_menu(options)
-    if (choice == 1):
-        nutrient_menu(connection)
-    elif (choice == 2):
-        food_item_menu(connection)
-    elif (choice == 3):
-        recipe_menu(connection)
-    elif (choice == 4):
-        plan_menu(connection)
+
 
 
 # -----------------------------------------------------------------MAIN--------------------------------------------------------------------

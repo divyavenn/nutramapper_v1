@@ -17,13 +17,10 @@ def get_nutrient_amount(cursor, food_id, nutrient_id):
     else:
         return x[1]
 
-# pretty-prints single nutrient requirements
-# [nutrient_id, nutrient name, daily requirement, units] -> None
-def print_nutrient_requ(n):
-    print("[ID " + str(n[0]) + "] : " + n[1] + " has a daily requirement of " + str(n[2]) + " " + n[3])
+
 
 #gets the list of nutrients that are being tracked along with DV
-# cursor -> [nutrient_id, nutrient name, daily requirement, units]
+# get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
 def get_nutrients_to_track(cursor):
     nutr_to_track = []
     cursor.execute('select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n')
