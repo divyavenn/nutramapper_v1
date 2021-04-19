@@ -1,6 +1,6 @@
 
 from data_validation import qform_varchar, qform_num
-from search import search_nutrient
+from search import search_nutrient, search_nutrient_data
 
 
 #NUTRIENT DATA: [nutrient id, amt, food_id]
@@ -8,13 +8,10 @@ from search import search_nutrient
 #NUTRIENT: [nutrient_id, nutrient_name, units]
 
 # gets amount of nutrient in food item
-# cursor, food_id, nutrient_id -> amount
+# cursor, food_id, nutrient_id/None -> [nutrient id, amt, food_id]
 def get_nutrient_amount(cursor, food_id, nutrient_id):
-    x = []
-    query = "select nutrient_id, amt, food_id from nutrient_data where food_id = " + qform_varchar(food_id) + " and nutrient_id = " + qform_varchar(nutrient_id) + ""
-    cursor.execute(query)
-    for i in cursor:
-        x = i
+    #cursor, food_id, nutrient_id/None -> [nutrient id, amt, food_id]
+    x = search_nutrient_data(cursor, food_id, nutrient_id)
     if (len(x) == 0):
         return 0
     else:
@@ -24,8 +21,6 @@ def get_nutrient_amount(cursor, food_id, nutrient_id):
 # [nutrient_id, nutrient_name, units] -> None
 def print_nutrient(n):
     print("[ID " + str(n[0]) + "] : " + n[1] + " measured in " + n[2])
-
-
 
 
 # pretty-prints single nutrient requirements
