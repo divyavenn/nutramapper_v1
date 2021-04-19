@@ -20,18 +20,24 @@ def qform_varchar(x):
 def qform_num(x):
     return " '" + str(x) + "'"
 
-def get_name(str):
+def input_name(str):
     name = input(str)
     while not(input_form(name) == 0):
         print("That's not a valid name. Try again.")
         return get_name(str)
     return name
 
-
-def get_number(str):
+def input_number(str):
     num = input(str)
     while not(input_form(num) == 1):
         print("That's not a valid number. Try again.")
         return get_number(str)
     return num
 
+def input_yes(str):
+    affirmatives = set("yes" + "y" + "ok" + "okay" + "sure")
+    ans = input(str + "[Y/N]")
+    if ans.lower() in affirmatives:
+        return True
+    else:
+        return False

@@ -13,6 +13,14 @@ def q_get_list_of_tuples(cursor, query):
         list.append(i)
     return check_exists(list)
 
+def q_get_value(cursor, query, index):
+    x = q_get_tuple(cursor, query)
+    if (x is None):
+        return None
+    else:
+        return x[index]
+
+
 # Searches for ingredient by name or by specific nid (if not, None), returns nutritional info
 # cursor, nutrient_id/None -> [nutrient_id, nutrient_name, units]
 def search_nutrient(cursor, nid):
@@ -28,10 +36,12 @@ def search_nutrient(cursor, nid):
 # cursor, food_id/None -> [food_id, food_name, cost_per_100]
 def search_food_item(cursor, food_id):
     x = []
+    output_fields = "food_id, food_name, cost_per_100g"
+    table = "food_item"
     if (food_id is None):
-        x = search(cursor, "Enter a food item", "food_id, food_name, cost_per_100g", "food_item", "food_id")
+        x = search(cursor, "Enter a food item", output_fields, table, "food_id")
     else:
-        query = "select food_id, food_name, cost_per_100g from food_item where food_id = " + qform_varchar(food_id)
+        query = "select " + output_fields + " from " + table + "where food_id = " + qform_varchar(food_id)
         x = q_get_tuple(cursor, query)
     return x
 
@@ -51,9 +61,9 @@ def search_recipe(cursor, recipe_id):
 
 
 # Searches for plan by name or through specific plan_id
-# cursor, plan_id/None -> [plan_id, plan_name]
+# cursor, plan_id/None -> [plan_id, plan_name, num_days]
 def search_plan(cursor, plan_id):
-    output_fields = "plan_id, plan_name"
+    output_fields = "plan_id, plan_name, num_days"
     table = "plan"
     if (plan_id is None):
         x = search(cursor, "Enter a plan", output_fields, table, "plan_name", "plan_id")

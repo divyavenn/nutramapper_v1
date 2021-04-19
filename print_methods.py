@@ -1,7 +1,8 @@
-from search import search_food_item, search_ingredient, search_recipe, q_get_tuple
+from search import search_food_item, search_ingredient, search_recipe, q_get_tuple, q_get_list_of_tuples, search_meal
 from recipe import nutritional_total_recipe
 from meal import recipe_id_meal
 from data_validation import qform_varchar, qform_num
+from plan import plan_name_plan, fulfills_nutritional_reqs
 
 # pretty-prints single nutrient
 # [nutrient_id, nutrient_name, units] -> None
@@ -39,15 +40,14 @@ def print_recipe(cursor, recipe_id):
 def print_recipe_list(cursor):
     print("RECIPE INDEX")
     query = "select recipe_name from recipe"
-    cursor.execute(query)
-    recipes = []
-    for r in cursor:
-        print(r[0])
-        recipes.append(r)
-    if (len(recipes) == 0):
+    recipes = q_get_list_of_tuples(cursor, query)
+    if (recipes is None):
         return False
     else:
+        for r in recipes:
+            print_recipe(cursor, r)
         return True
+
 
 # prints meals prettily
 # print_meal(cursor, meal) -> None
@@ -56,3 +56,26 @@ def print_meal(cursor, meal):
     query = "select recipe_name from recipe where recipe_id = " + qform_num(recipe_id)
     recipe_name = q_get_tuple(cursor, query)
     print(str(meal[2]) + " servings of " + recipe_name)
+
+
+
+def print_plan(cursor, plan_id):
+    meals = search_meal(cursor, None, plan_id)
+    if meals is not None:
+        print("This plan has: \n")
+        for m in meals:
+            print_meal(cursor, m)
+        fulfills_nutritional_reqs(cursor, plan_id)
+    else:
+        print("This plan has no meals yet!")
+
+def print_plan_list(cursor):
+    print("PLAN LIST")
+    query = "select * from plan"
+    plans = q_get_list_of_tuples(cursor, query)
+    if (plans is None):
+        return False
+    else:
+        for p in plans:
+            print(plan_name_plan(p))
+        return True
