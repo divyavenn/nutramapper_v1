@@ -37,8 +37,12 @@ def input_number(str):
 
 def input_yes(str):
     affirmatives = set("yes" + "y" + "ok" + "okay" + "sure")
+    negatives = set("no" + "n")
     ans = input(str + "[Y/N]")
     if ans.lower() in affirmatives:
         return True
-    else:
+    elif ans.lower() in negatives:
         return False
+    else:
+        print("Invalid input. Try again.")
+        return input_yes(str)

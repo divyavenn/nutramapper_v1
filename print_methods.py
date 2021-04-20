@@ -18,7 +18,7 @@ def print_nutrient_food_data(cursor, data):
     if data is not None:
         nutrient = search_nutrient(cursor, data[0])
         name = nutrient[1]
-        print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]) + " " + data[2])
+        print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]))
 
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None
@@ -55,12 +55,17 @@ def print_recipe(cursor, recipe):
     name = recipe[1]
     ingredients = search_ingredient(cursor, None, recipe_id)
     print(name)
-    for i in ingredients:
-        print_ingredient(cursor, i)
-    print("Nutritional Info:")
-    nutr_totals = nutritional_total_recipe(cursor, recipe_id)
-    for i in nutr_totals:
-        print(i[1] + ": " + str(i[2]) + " " + i[3])
+    print("-" * 64)
+    if ingredients is not None:
+        for i in ingredients:
+            print_ingredient(cursor, i)
+        print("Nutritional Info:")
+        nutr_totals = nutritional_total_recipe(cursor, recipe_id)
+        for i in nutr_totals:
+            print(i[1] + ": " + str(i[2]) + " " + i[3])
+    else:
+        print("**This recipe has no ingredients**")
+    print("-"*64)
 
 
 #prints recipe list and returns if there are any recipes
@@ -131,5 +136,5 @@ def print_menu(options):
         print(opt_stmt)
         i = i + 1
     print(64 * "-" + "")
-    print("**Type 0 to end program.")
+    print("**Type 0 to end program and commit all changes.")
     print("\n \n \n")

@@ -1,7 +1,6 @@
 from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
 from search import search_food_item, search_ingredient
 
-
 #INGREDIENT: [food_id, recipe_id, amount_in_grams]
 
 #checks if ingredient exists;if not, adds it, if so gives option to update ingredient
@@ -11,7 +10,7 @@ def add_ingredient(cursor, recipe_id, food_id):
         food_item = search_food_item(cursor, None)
         food_id = food_item[0]
     # search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
-    if not (search_ingredient(cursor, food_id, recipe_id) == None):
+    if search_ingredient(cursor, food_id, recipe_id) is not None:
         print("This ingredient is already a part of the recipe.")
         input("\n \n Press any key to continue.")
     else:

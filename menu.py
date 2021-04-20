@@ -8,7 +8,7 @@ from meal import *
 def main_menu(cursor):
     cls()
     options = ['View/Edit Tracked Nutrients',
-               'View Food Items',
+               'View Information for a Food Item',
                'View/Edit Recipes',
                'View/Edit Plans']
     choice = make_menu(options)
@@ -55,20 +55,14 @@ def nutrient_menu(cursor):
 
 def food_item_menu(cursor):
     cls()
-    options = ['View Information For a Food Item',
-              'Return to Main Menu']
-    choice = make_menu(options)
-    if (choice == 1):
-        #search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
-        food = search_food_item(cursor, None)
-        # get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
-        nutrients_to_track = get_nutrients_to_track(cursor)
-        # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
-        print_tracked_nutr_food(cursor, food, nutrients_to_track)
-        input("\n \n Press any key to continue.")
-        food_item_menu(cursor)
-    elif (choice == 2):
-        main_menu(cursor)
+    #search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
+    food = search_food_item(cursor, None)
+    # get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
+    nutrients_to_track = get_nutrients_to_track(cursor)
+    # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
+    print_tracked_nutr_food(cursor, food, nutrients_to_track)
+    input("\n \n Press any key to return to the main menu.")
+    main_menu(cursor)
 
 def recipe_menu(cursor):
     cls()

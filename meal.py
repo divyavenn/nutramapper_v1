@@ -15,7 +15,9 @@ def num_servings_meal(meal):
 #add meal if doesn't exists, if not, give option to update
 #add_meal(cursor, plan_id, recipe_id/None)-> None
 def add_meal(cursor, plan_id, recipe_id):
+    from print_methods import print_recipe_list
     if recipe_id is None:
+        print_recipe_list()
         recipe = search_recipe(cursor, None)
         recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
@@ -46,7 +48,6 @@ def remove_meal(cursor, plan_id, recipe_id):
 def alter_meal(cursor, plan_id):
     recipe = search_recipe(cursor, None)
     recipe_id = recipe[0]
-    print_recipe(cursor, recipe)
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if (search_meal(cursor, recipe_id, plan_id) is None):
         if(input_yes("This recipe is not part of the plan. Would you like to add it?")):

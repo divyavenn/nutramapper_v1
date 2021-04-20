@@ -1,7 +1,7 @@
 from ingredient import add_ingredient
 from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples, search_meal
 from nutrient import get_nutrients_to_track, get_nutrient_amount
-from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
+from data_validation import *
 import decimal
 
 #adds up the total amounts for each nutrient of each food item in a recipe
@@ -13,14 +13,15 @@ def nutritional_total_recipe(cursor, recipe_id):
     nutr_totals = []
     for nutrient in nutr_reqs:
         total = 0
-        for n in ingredients:
-            food_id = n[0]
-            grams = n[2]
-            # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
-            amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
-            total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
-        # [nutrient id, nutrient name, total in recipe, units]
-        nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
+        if ingredients is not None:
+            for n in ingredients:
+                food_id = n[0]
+                grams = n[2]
+                # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
+                amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
+                total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
+            # [nutrient id, nutrient name, total in recipe, units]
+            nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
     return nutr_totals
 
 
@@ -34,7 +35,7 @@ def add_recipe(cursor):
      # find recipe_id of new recipe
     query = ("select recipe_id from recipe where (recipe_name = " + qform_varchar(name) + ")")
     recipe_id = q_get_value(cursor, query, 0)
-    while (input("Would you like to add an ingredient [Y/N]") == "Y"):
+    while (input_yes("Would you like to add an ingredient")):
          add_ingredient(cursor, recipe_id, None)
 
 
