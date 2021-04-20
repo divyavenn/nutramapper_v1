@@ -32,9 +32,12 @@ def nutrient_menu(cursor):
     if (choice == 1):
         cls()
         nutr_to_track = get_nutrients_to_track(cursor)
-        print("Nutrients requirements being monitored: \n")
-        for n in nutr_to_track:
-            print_nutrient_requ(n)
+        if (nutr_to_track is not None):
+            print("Nutrients requirements being monitored: \n")
+            for n in nutr_to_track:
+                print_nutrient_requ(n)
+        else:
+            print("No nutrients are currently being tracked.")
         input("\n \n Press any key to continue.")
         nutrient_menu(cursor)
     elif (choice == 2):
@@ -59,8 +62,11 @@ def food_item_menu(cursor):
     food = search_food_item(cursor, None)
     # get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
     nutrients_to_track = get_nutrients_to_track(cursor)
-    # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
-    print_tracked_nutr_food(cursor, food, nutrients_to_track)
+    if (nutrients_to_track is not None):
+        # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
+        print_tracked_nutr_food(cursor, food, nutrients_to_track)
+    else:
+        print("No nutrients are being tracked.")
     input("\n \n Press any key to return to the main menu.")
     main_menu(cursor)
 

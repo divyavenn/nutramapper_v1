@@ -1,4 +1,4 @@
-from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
+from data_validation import qform_varchar, qform_num, input_number, input_yes
 from search import search_food_item, search_ingredient
 
 #INGREDIENT: [food_id, recipe_id, amount_in_grams]

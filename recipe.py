@@ -8,20 +8,21 @@ import decimal
 #nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, nutrient_name, total_in_recipe, units]
 def nutritional_total_recipe(cursor, recipe_id):
     nutr_reqs = get_nutrients_to_track(cursor)
-    #search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
-    ingredients = search_ingredient(cursor, None, recipe_id)
     nutr_totals = []
-    for nutrient in nutr_reqs:
-        total = 0
-        if ingredients is not None:
-            for n in ingredients:
-                food_id = n[0]
-                grams = n[2]
-                # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
-                amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
-                total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
-            # [nutrient id, nutrient name, total in recipe, units]
-            nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
+    if (nutr_reqs is not None):
+        #search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
+        ingredients = search_ingredient(cursor, None, recipe_id)
+        for nutrient in nutr_reqs:
+            total = 0
+            if ingredients is not None:
+                for n in ingredients:
+                    food_id = n[0]
+                    grams = n[2]
+                    # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
+                    amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
+                    total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
+                # [nutrient id, nutrient name, total in recipe, units]
+                nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
     return nutr_totals
 
 

@@ -1,5 +1,5 @@
 from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
-from search import search_recipe, search_meal, q_get_tuple, q_get_list_of_tuples
+from search import search_recipe, search_meal
 from print_methods import print_recipe
 
 #MEAL [recipe_id, plan_id, num_servings]
@@ -19,7 +19,11 @@ def add_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         print_recipe_list()
         recipe = search_recipe(cursor, None)
-        recipe_id = recipe[0]
+        if recipe is None:
+            print("There are no recipes.")
+            return None
+        else:
+            recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if (search_meal(cursor, recipe_id, plan_id) is None):
         amount = input_number("How many servings of this item would you like to add?")
@@ -36,8 +40,12 @@ def add_meal(cursor, plan_id, recipe_id):
 #remove_meal(cursor, plan_id, recipe_id/None)-> None
 def remove_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
-        recipe_item = search_recipe(cursor, None)
-        recipe_id = recipe_item[0]
+        recipe = search_recipe(cursor, None)
+        if recipe is None:
+            print("There are no recipes.")
+            return None
+        else:
+            recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if not (search_meal(cursor, recipe_id, plan_id) is None):
         query = ("delete from meal where recipe_id =" + qform_num(recipe_id) + " and plan_id = " + qform_num(plan_id))
@@ -47,7 +55,11 @@ def remove_meal(cursor, plan_id, recipe_id):
 #alter_meal(cursor, plan_id, recipe_id/None)-> None
 def alter_meal(cursor, plan_id):
     recipe = search_recipe(cursor, None)
-    recipe_id = recipe[0]
+    if recipe is None:
+        print("There are no recipes.")
+        return None
+    else:
+        recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if (search_meal(cursor, recipe_id, plan_id) is None):
         if(input_yes("This recipe is not part of the plan. Would you like to add it?")):

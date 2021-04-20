@@ -17,8 +17,9 @@ def print_nutrient(n):
 def print_nutrient_food_data(cursor, data):
     if data is not None:
         nutrient = search_nutrient(cursor, data[0])
-        name = nutrient[1]
-        print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]))
+        if nutrient is not None:
+            name = nutrient[1]
+            print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]))
 
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None
@@ -32,9 +33,10 @@ def print_nutrient_requ(n):
 def print_ingredient(cursor, ingredient):
     food_id = ingredient[0]
     food_item = search_food_item(cursor, food_id)
-    food_name = food_item[1]
-    amount_in_grams = ingredient[2]
-    print("\t " + food_name + ": \n \t \t" + str(amount_in_grams) + " grams")
+    if food_item is not None:
+        food_name = food_item[1]
+        amount_in_grams = ingredient[2]
+        print("\t " + food_name + ": \n \t \t" + str(amount_in_grams) + " grams")
 
 
 #prints all the tracked nutritional data for a food item
@@ -45,7 +47,8 @@ def print_tracked_nutr_food(cursor, food, tracked_nutrients):
     print("Per 100 grams, " + food_name + " has:")
     for n in tracked_nutrients:
         data = search_nutrient_data(cursor, food_id, n[0])
-        print_nutrient_food_data(cursor, data)
+        if data is not None:
+            print_nutrient_food_data(cursor, data)
 
 #pretty prints recipe
 #print_recipe(cursor, recipe_id) -> None
@@ -98,10 +101,8 @@ def print_meal(cursor, meal):
 
 def print_plan(cursor, plan):
     from plan import fulfills_nutritional_requs
-    from search import search_plan
     plan_id = plan[0]
     # cursor, plan_id/None -> [plan_id, plan_name, num_days]
-    plan = search_plan(cursor, plan_id)
     meals = search_meal(cursor, None, plan_id)
     if meals is not None:
         print("Plan " + str(plan[1]) + " covers " + str(plan[2]) + " days and has: \n")
