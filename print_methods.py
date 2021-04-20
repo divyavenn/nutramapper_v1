@@ -73,6 +73,7 @@ def print_recipe(cursor, recipe):
 #prints recipe list and returns if there are any recipes
 # cursor -> boolean
 def print_recipe_list(cursor):
+    cls()
     print("RECIPE INDEX")
     print("-" * 64)
     query = "select recipe_name from recipe"
@@ -115,6 +116,7 @@ def print_plan(cursor, plan):
         print("This plan has no meals yet!")
 
 def print_plan_list(cursor):
+    cls()
     from plan import plan_name_plan
     print("PLAN LIST")
     print("-" * 64)
