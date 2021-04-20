@@ -1,4 +1,5 @@
 import string
+
 #returns -2 for empty input, -1 for invalid input, 0 for name, 1 for id
 def input_form(str):
     name = set(string.ascii_lowercase + string.ascii_uppercase + ',' + string.digits + '%' + '(' + ')' + '-' + ' ')

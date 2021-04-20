@@ -32,10 +32,6 @@ def search_nutrient(cursor, nid):
     else:
         query = "select nutrient_id, nutrient_name, units from nutrient where nutrient_id = " + qform_varchar(nid)
         x = q_get_tuple(cursor, query)
-    if x is not None:
-        print_nutrient(cursor, x)
-    else:
-        print("No nutrients found, sorry!")
     return x
 
 # Searches for ingredient by name or through specific food-id
@@ -45,7 +41,7 @@ def search_food_item(cursor, food_id):
     output_fields = "food_id, food_name"
     table = "food_item"
     if (food_id is None):
-        x = search(cursor, "Enter a food item", output_fields, table, "food_id")
+        x = search(cursor, "Enter a food item", output_fields, table, "food_name", "food_id")
     else:
         query = "select " + output_fields + " from " + table + " where food_id = " + qform_varchar(food_id)
         x = q_get_tuple(cursor, query)

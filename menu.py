@@ -1,14 +1,14 @@
 from print_methods import *
-from data_validation import *
 from nutrient import *
 from recipe import *
-from search import *
 from ingredient import *
 from plan import *
 from meal import *
+
 def main_menu(cursor):
+    cls()
     options = ['View/Edit Tracked Nutrients',
-               'View/Edit Food Items',
+               'View Food Items',
                'View/Edit Recipes',
                'View/Edit Plans']
     choice = make_menu(options)
@@ -22,6 +22,7 @@ def main_menu(cursor):
         plan_menu(cursor)
 
 def nutrient_menu(cursor):
+    cls()
     options = ['View Nutrient Requirements',
               'Add Nutrient Requirement to Track',
               'Update Nutrient Requirement',
@@ -29,25 +30,31 @@ def nutrient_menu(cursor):
               'Return to Main Menu']
     choice = make_menu(options)
     if (choice == 1):
+        cls()
         nutr_to_track = get_nutrients_to_track(cursor)
         print("Nutrients requirements being monitored: \n")
         for n in nutr_to_track:
             print_nutrient_requ(n)
+        input("\n \n Press any key to continue.")
         nutrient_menu(cursor)
     elif (choice == 2):
+        cls()
         add_nutrients_to_track(cursor, None)
         cursor.execute("commit")
         nutrient_menu(cursor)
     elif (choice == 3):
+        cls()
         update_nutrients_to_track(cursor, None)
         nutrient_menu(cursor)
     elif (choice == 4):
+        cls()
         remove_nutrients_to_track(cursor)
         nutrient_menu(cursor)
     elif (choice == 5):
         main_menu(cursor)
 
 def food_item_menu(cursor):
+    cls()
     options = ['View Information For a Food Item',
               'Return to Main Menu']
     choice = make_menu(options)
@@ -58,29 +65,34 @@ def food_item_menu(cursor):
         nutrients_to_track = get_nutrients_to_track(cursor)
         # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
         print_tracked_nutr_food(cursor, food, nutrients_to_track)
+        input("\n \n Press any key to continue.")
         food_item_menu(cursor)
     elif (choice == 2):
         main_menu(cursor)
 
 def recipe_menu(cursor):
+    cls()
     options = ['View/Update Recipes',
               'Create New Recipe',
                'Return To Main Menu']
     choice = make_menu(options)
     if (choice == 1):
-        if (print_recipe_list()):
+        if (print_recipe_list(cursor)):
             recipe = search_recipe(cursor, None)
-            print_recipe(cursor, recipe[0])
-            recipe_update_menu(cursor, recipe[0])
+            recipe_update_menu(cursor, recipe)
         recipe_menu(cursor)
     elif (choice == 2):
+        cls()
         add_recipe(cursor)
         recipe_menu(cursor)
     elif (choice == 3):
         main_menu(cursor)
 
 
-def recipe_update_menu(cursor, recipe_id):
+def recipe_update_menu(cursor, recipe):
+    recipe_id = recipe[0]
+    cls()
+    print_recipe(cursor, recipe)
     if input_yes("Would you like to update this recipe?"):
         options = ['Alter Ingredient Quantity',
                    'Add Ingredient',
@@ -90,22 +102,27 @@ def recipe_update_menu(cursor, recipe_id):
                    'Return to Main Menu']
         choice = make_menu(options)
         if (choice == 1):
-            alter_ingredient(cursor, recipe_id)
-            recipe_update_menu(cursor)
+            alter_ingredient(cursor, recipe_id, None)
+            recipe_update_menu(cursor,recipe)
         elif(choice == 2):
             add_ingredient(cursor, recipe_id, None)
-            recipe_update_menu(cursor)
+            recipe_update_menu(cursor,recipe)
         elif(choice==3):
-            remove_ingredient(cursor, recipe_id)
-            recipe_update_menu(cursor)
+            remove_ingredient(cursor, recipe_id, None)
+            recipe_update_menu(cursor, recipe)
         elif (choice == 4):
             rename_recipe(cursor, recipe_id)
+            recipe_update_menu(cursor, recipe)
         elif (choice==5):
             delete_recipe(cursor, recipe_id)
+            recipe_menu(cursor)
         elif(choice==6):
             main_menu(cursor)
 
-def plan_update_menu(cursor, plan_id):
+def plan_update_menu(cursor, plan):
+    plan_id = plan[0]
+    cls()
+    print_plan(cursor, plan)
     if input_yes("Would you like to update this plan?"):
         options = ['Add Recipe To Plan',
                    'Remove Recipe From Plan',
@@ -117,20 +134,27 @@ def plan_update_menu(cursor, plan_id):
         choice = make_menu(options)
         if (choice == 1):
             add_meal(cursor, plan_id, None)
+            plan_update_menu(cursor, plan)
         elif (choice == 2):
             remove_meal(cursor, plan_id, None)
+            plan_update_menu(cursor, plan)
         elif (choice == 3):
             change_plan_days(cursor, plan_id)
+            plan_update_menu(cursor, plan)
         elif (choice == 4):
             alter_meal(cursor, plan_id)
+            plan_update_menu(cursor, plan)
         elif (choice == 5):
             rename_plan(cursor, plan_id)
+            plan_update_menu(cursor, plan)
         elif (choice == 6):
             remove_plan(cursor, plan_id)
+            plan_menu(cursor)
         elif (choice == 7):
             main_menu(cursor)
 
 def plan_menu(cursor):
+    cls()
     choice = None
     if (choice is None):
         options = ['View/Update Meal Plan',
@@ -138,15 +162,16 @@ def plan_menu(cursor):
                    'Return To Main Menu']
         choice = make_menu(options)
     if (choice == 1):
+        cls()
         if (print_plan_list(cursor) == False):
             if (input_yes("There aren't any meal plans. Would you like to add one?")):
                 add_plan(cursor)
         else:
             plan = search_plan(cursor, None)
-            print_plan(cursor, plan[0])
-            plan_update_menu(cursor, plan[0])
+            plan_update_menu(cursor, plan)
         plan_menu(cursor)
     elif (choice == 2):
+        cls()
         add_plan(cursor)
         plan_menu(cursor)
     elif (choice == 3):

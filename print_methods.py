@@ -1,7 +1,11 @@
 
 from search import *
 from data_validation import qform_num
+import os
 
+def cls():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n" * 100)
 
 # pretty-prints single nutrient
 # [nutrient_id, nutrient_name, units] -> None
@@ -11,9 +15,10 @@ def print_nutrient(n):
 #pretty prints single nutritional data
 #[nutrient id, amt, food_id] -> None
 def print_nutrient_food_data(cursor, data):
-    nutrient = search_nutrient(cursor, data[0])
-    name = nutrient[1]
-    print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]) + " " + data[2])
+    if data is not None:
+        nutrient = search_nutrient(cursor, data[0])
+        name = nutrient[1]
+        print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]) + " " + data[2])
 
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None
@@ -23,12 +28,12 @@ def print_nutrient_requ(n):
 
 
 #pretty prints the ingredient
-#cursor, recipe_id, food_id -> None
+#cursor, [food_id, recipe_id, amount_in_grams]-> None
 def print_ingredient(cursor, ingredient):
     food_id = ingredient[0]
     food_item = search_food_item(cursor, food_id)
     food_name = food_item[1]
-    amount_in_grams = ingredient[1]
+    amount_in_grams = ingredient[2]
     print("\t " + food_name + ": \n \t \t" + str(amount_in_grams) + " grams")
 
 
@@ -62,13 +67,16 @@ def print_recipe(cursor, recipe):
 # cursor -> boolean
 def print_recipe_list(cursor):
     print("RECIPE INDEX")
+    print("-" * 64)
     query = "select recipe_name from recipe"
     recipes = q_get_list_of_tuples(cursor, query)
     if (recipes is None):
         return False
     else:
         for r in recipes:
-            print_recipe(cursor, r)
+            print("\t " + str(r[0]))
+        print("-" * 64)
+        print("\n \n")
         return True
 
 
@@ -83,16 +91,19 @@ def print_meal(cursor, meal):
 
 
 
-def print_plan(cursor, plan_id):
+def print_plan(cursor, plan):
     from plan import fulfills_nutritional_requs
     from search import search_plan
+    plan_id = plan[0]
     # cursor, plan_id/None -> [plan_id, plan_name, num_days]
     plan = search_plan(cursor, plan_id)
     meals = search_meal(cursor, None, plan_id)
     if meals is not None:
         print("Plan " + str(plan[1]) + " covers " + str(plan[2]) + " days and has: \n")
+        print("-" * 64)
         for m in meals:
             print_meal(cursor, m)
+        print("-"*64)
         fulfills_nutritional_requs(cursor, plan_id)
     else:
         print("This plan has no meals yet!")
@@ -100,13 +111,16 @@ def print_plan(cursor, plan_id):
 def print_plan_list(cursor):
     from plan import plan_name_plan
     print("PLAN LIST")
+    print("-" * 64)
     query = "select * from plan"
     plans = q_get_list_of_tuples(cursor, query)
     if (plans is None):
         return False
     else:
         for p in plans:
-            print(plan_name_plan(p))
+            print("\t " + plan_name_plan(p))
+        print("-"*64)
+        print("\n \n")
         return True
 
 def print_menu(options):
@@ -116,5 +130,6 @@ def print_menu(options):
         opt_stmt = str(i) + ":" + opt + ""
         print(opt_stmt)
         i = i + 1
-    print(67 * "-" + "")
+    print(64 * "-" + "")
     print("**Type 0 to end program.")
+    print("\n \n \n")

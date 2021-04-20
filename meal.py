@@ -28,6 +28,7 @@ def add_meal(cursor, plan_id, recipe_id):
         cursor.execute(query)
     else:
         print("This recipe is already a part of this plan")
+        input("\n \n Press any key to continue.")
 
 #remove meal if exists, if not do nothing
 #remove_meal(cursor, plan_id, recipe_id/None)-> None

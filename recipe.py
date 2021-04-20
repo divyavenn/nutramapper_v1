@@ -1,5 +1,5 @@
 from ingredient import add_ingredient
-from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples
+from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples, search_meal
 from nutrient import get_nutrients_to_track, get_nutrient_amount
 from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
 import decimal
@@ -40,12 +40,15 @@ def add_recipe(cursor):
 
 # rename_recipe(cursor, recipe_id) -> None
 def rename_recipe(cursor, recipe_id):
-    new_name = input_name("What is the name of this recipe?")
+    new_name = input_name("What is the new name of this recipe?")
     query = "update recipe set recipe_name = " + qform_num(new_name) + "where recipe_id = " + qform_num(recipe_id)
     cursor.execute(query)
 
 # delete_recipe(cursor, recipe_id) -> None
 def delete_recipe(cursor, recipe_id):
     query = "delete from recipe where recipe_id = " + qform_num(recipe_id)
-    cursor.execute(query)
-
+    if (search_meal(cursor, recipe_id, None)) is not None:
+        if(input_yes("Are you sure? This will delete the recipe from one or more meal plans.")):
+            cursor.execute(query)
+    else:
+        cursor.execute(query)

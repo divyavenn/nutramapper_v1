@@ -88,7 +88,7 @@ create table meal(
         on update cascade,
 	constraint meal_of foreign key (recipe_id)
 		references recipe(recipe_id)
-        on delete restrict
+        on delete cascade
         on update cascade);
         
 /* Populate with demo data */

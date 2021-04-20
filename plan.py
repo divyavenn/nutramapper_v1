@@ -75,7 +75,7 @@ def fulfills_nutritional_requs(cursor, plan_id):
             planwide_avg[i] = decimal.Decimal(sum)/decimal.Decimal(num_days)
             if planwide_avg[i] < daily_reqs[i]:
                 diff = round(daily_reqs[i] - planwide_avg[i],1)
-                print("You miss your goal for " + str(nutrients[i][1]) + " by an average of: \n" + str(diff) + " " + str(nutrients[i][3]) + " per day.")
+                print("You miss your goal for " + str(nutrients[i][1]) + " by an average of: " + str(diff) + " " + str(nutrients[i][3]) + " per day.")
             elif planwide_avg[i] > daily_reqs[i]:
                 surplus = round(planwide_avg[i] - daily_reqs[i],1)
-                print("You exceed your goal for " + str(nutrients[i][1]) + " by an average of: \n" + str(surplus) + " " + str(nutrients[i][3]) + " per day.")
+                print("You exceed your goal for " + str(nutrients[i][1]) + " by an average of: " + str(surplus) + " " + str(nutrients[i][3]) + " per day.")
