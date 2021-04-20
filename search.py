@@ -1,5 +1,5 @@
 import pymysql
-from data_validation import qform_varchar, qform_num
+from data_validation import qform_varchar, qform_num, cp_form
 from data_validation import input_form
 
 
@@ -21,6 +21,25 @@ def q_get_value(cursor, query, index):
     else:
         return x[index]
 
+#cursor, "proc", (arg1, arg2, arg3,...) -> [a,b,c...]
+def cp_get_tuple(cursor, proc, args):
+    cursor.callproc(proc, args)
+    for i in cursor:
+        return check_exists(i)
+# cursor, "proc", (arg1, arg2, arg3,...) -> [[a,b,c],[d,e,f]]
+def cp_get_list_of_tuples(cursor, proc, args):
+    list = []
+    cursor.callproc(proc, args)
+    for i in cursor:
+        list.append(i)
+    return check_exists(list)
+
+def cp_get_value(cursor, proc, args, index):
+    x = cp_get_tuple(cursor, proc, args)
+    if (x is None):
+        return None
+    else:
+        return x[index]
 
 # Searches for ingredient by name or by specific nid (if not, None), returns nutritional info
 # cursor, nutrient_id/None -> [nutrient_id, nutrient_name, units]
@@ -30,8 +49,7 @@ def search_nutrient(cursor, nid):
     if (nid == None):
         x = search(cursor, "Enter a nutrient", "nutrient_id, nutrient_name, units", "nutrient", "nutrient_name", "nutrient_id")
     else:
-        query = "select nutrient_id, nutrient_name, units from nutrient where nutrient_id = " + qform_varchar(nid)
-        x = q_get_tuple(cursor, query)
+        x = cp_get_tuple(cursor, 'search_nutrient', (nid,))
     return x
 
 # Searches for ingredient by name or through specific food-id
@@ -43,8 +61,8 @@ def search_food_item(cursor, food_id):
     if (food_id is None):
         x = search(cursor, "Enter a food item", output_fields, table, "food_name", "food_id")
     else:
-        query = "select " + output_fields + " from " + table + " where food_id = " + qform_varchar(food_id)
-        x = q_get_tuple(cursor, query)
+        print(food_id)
+        x = cp_get_tuple(cursor, 'search_food_item', (food_id,))
     return x
 
 
@@ -58,8 +76,7 @@ def search_recipe(cursor, recipe_id):
     if (recipe_id is None):
         x = search(cursor, "Enter a recipe", output_fields, table, "recipe_name", "recipe_id")
     else:
-        query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id)
-        x = q_get_tuple(cursor, query)
+        x = cp_get_tuple(cursor, 'search_recipe', (recipe_id,))
     if x is not None:
         print_recipe(cursor, x)
     else:
@@ -74,15 +91,22 @@ def search_plan(cursor, plan_id):
     table = "plan"
     if (plan_id is None):
         x = search(cursor, "Enter a plan", output_fields, table, "plan_name", "plan_id")
-        return x
     else:
-        query = "select " + output_fields + " from " + table + " where plan_id = " + qform_num(plan_id)
-        return q_get_tuple(cursor, query)
+        x = cp_get_tuple(cursor, 'search_plan', (plan_id,))
+    return x
 
 # Searches for ingredients by recipe_id and optionally food_id
 # search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
 def search_ingredient(cursor, food_id, recipe_id):
-    query = ""
+    fid = cp_form(food_id)
+    rid = cp_form(recipe_id)
+    proc = 'search_nutrient_data'
+    args = (fid, rid)
+    if food_id is not None and recipe_id is not None:
+        return cp_get_tuple(cursor, proc, args)
+    else:
+        return cp_get_list_of_tuples(cursor, proc, args)
+    """query = ""
     if food_id is None and recipe_id is not None:
         query = "select food_id, recipe_id, amount_in_grams from ingredient where recipe_id = " + qform_num(recipe_id)
         return q_get_list_of_tuples(cursor, query)
@@ -91,13 +115,21 @@ def search_ingredient(cursor, food_id, recipe_id):
         return q_get_list_of_tuples(cursor, query)
     elif food_id is not None and recipe_id is not None:
         query = "select food_id, recipe_id, amount_in_grams from ingredient where food_id = " + qform_varchar(food_id) + " and recipe_id = " + qform_num(recipe_id)
-        return q_get_tuple(cursor, query)
+        return q_get_tuple(cursor, query)"""
 
 
 # Searches for nutrient data by food_id and optionally nutrient_id
 # cursor, food_id/None, nutrient_id/None -> [nutrient id, amt, food_id]
 def search_nutrient_data(cursor, food_id, nutrient_id):
-    if food_id is not None and nutrient_id is None:
+    fid = cp_form(food_id)
+    nid = cp_form(nutrient_id)
+    proc = 'search_nutrient_data'
+    args = (fid, nid)
+    if food_id is not None and nutrient_id is not None:
+        return cp_get_tuple(cursor, proc, args)
+    else:
+        return cp_get_list_of_tuples(cursor, proc, args)
+    """if food_id is not None and nutrient_id is None:
         query = "select nutrient_id, amt, food_id from nutrient_data where food_id = " + qform_varchar(food_id)
         return q_get_list_of_tuples(cursor, query)
     elif food_id is None and nutrient_id is not None:
@@ -105,12 +137,20 @@ def search_nutrient_data(cursor, food_id, nutrient_id):
         return q_get_list_of_tuples(cursor, query)
     elif food_id is not None and nutrient_id is not None:
         query = "select nutrient_id, amt, food_id from nutrient_data where food_id = " + qform_varchar(food_id) + " and nutrient_id = " + qform_varchar(nutrient_id) + ""
-        return q_get_tuple(cursor, query)
+        return q_get_tuple(cursor, query)"""
 
 # Returns none if there are no meals
 #cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
 def search_meal(cursor, recipe_id, plan_id):
-    output_fields = "recipe_id, plan_id, num_servings"
+    rid = cp_form(recipe_id)
+    pid = cp_form(plan_id)
+    proc = 'search_meal'
+    args = (pid, rid)
+    if recipe_id is not None and plan_id is not None:
+        return cp_get_tuple(cursor, proc, args)
+    else:
+        return cp_get_list_of_tuples(cursor, proc, args)
+    """output_fields = "recipe_id, plan_id, num_servings"
     table = "meal"
     if recipe_id is not None and plan_id is None:
         query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id)
@@ -120,7 +160,7 @@ def search_meal(cursor, recipe_id, plan_id):
         return q_get_list_of_tuples(cursor, query)
     elif recipe_id is not None and plan_id is not None:
         query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id) + " and plan_id = " + qform_num(plan_id)
-        return q_get_tuple(cursor, query)
+        return q_get_tuple(cursor, query)"""
 
 #Searches for a unique result using user input. performs data validation to avoid SQL errors
 #cursor, instructions to user, all cols to retrieve, table, name_column, id column -> all cols to retrieve

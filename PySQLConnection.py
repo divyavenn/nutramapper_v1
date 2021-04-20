@@ -2,8 +2,7 @@ from menu import main_menu
 from data_validation import input_form, input_number
 from print_methods import cls
 import pymysql
-
-
+from search import *
 
 #returns connection
 def try_connect():
@@ -31,33 +30,45 @@ def try_connect():
         input("\n \n \n Press any key to continue...")
         return try_connect()
 
+def intro():
+    cls()
+    print("Hi! This is a meal planning calculator that uses information \n"
+          "from the most reliable and complete nutritional database out there,\n"
+          "compiled by the USDA. You can decide what nutrient requirements\n"
+          "you want to meet, save recipes, and test out meal plans. Search \n"
+          "for nutrients, food items, recipes, and plans using either name or ID - \n"
+          "and no need to worry about being exact! It's fast, simple, \n"
+          "and intuitive. Just give it a go!")
 
+    input("\n \n \n Press any key to continue...")
+    cls()
+    print("First, we need to connect to your SQL server. Make sure \n"
+          "that both the USDA database and the meal plan database \n"
+          "have been imported and that your server is running.")
 
-cls()
-print("Hi! This is a meal planning calculator that uses information \n"
-      "from the most reliable and complete nutritional database out there,\n"
-      "compiled by the USDA. You can decide what nutrient requirements\n"
-      "you want to meet, save recipes, and test out meal plans. Search \n"
-      "for nutrients, food items, recipes, and plans using either name or ID - \n"
-      "and no need to worry about being exact! It's fast, simple, \n"
-      "and intuitive. Just give it a go!")
+    input("\n \n \n Press any key to continue...")
 
-input("\n \n \n Press any key to continue...")
-cls()
-print("First, we need to connect to your SQL server. Make sure \n"
-      "that both the USDA database and the meal plan database \n"
-      "have been imported and that your server is running.")
+    connection = try_connect()
+    cls()
+    print("Connection successful! Ready to start?")
 
-input("\n \n \n Press any key to continue...")
+    input("\n \n \n Press any key to continue...")
+    cls()
+    return connection
 
-connection = try_connect()
+#connection = intro()
+connection = pymysql.connect(host='localhost',
+                                     port=3306,
+                                     user='root',
+                                     password='0926',
+                                     db='meal_plan',
+                                     charset='utf8mb4')
+
 cursor = connection.cursor()
-cls()
-print("Connection successful! Ready to start?")
 
-input("\n \n \n Press any key to continue...")
-cls()
-main_menu(connection)
+x = cp_get_list_of_tuples(cursor, 'search_meal', ("%", 2))
+print(x)
+#main_menu(connection)
 
 print("Committing changes...\n")
 connection.commit()

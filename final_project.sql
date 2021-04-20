@@ -90,7 +90,37 @@ create table meal(
 		references recipe(recipe_id)
         on delete cascade
         on update cascade);
-        
+	
+/* procedures */
+
+drop procedure if exists search_nutrient;
+create procedure search_nutrient (in nid nvarchar(4))
+	select nutrient_id, nutrient_name, units from nutrient where nutrient_id = nid;
+
+drop procedure if exists search_food_item;
+create procedure search_food_item(in fid nvarchar(5))
+	select food_id, food_name from food_item where food_id = fid;
+
+drop procedure if exists search_recipe;
+create procedure search_recipe(in rid int)
+	select recipe_id, recipe_name from recipe where recipe_id = rid;
+
+drop procedure if exists search_plan;
+create procedure search_plan(in pid int)
+	select plan_id, plan_name, num_days from plan where plan_id = pid;
+
+drop procedure if exists search_meal;
+create procedure search_meal(in pid varchar(4), in rid varchar(4))
+	select * from meal where plan_id like pid and recipe_id like rid;
+
+drop procedure if exists search_ingredient;
+create procedure search_ingredient(in fid varchar(4), in rid varchar(4))
+	select * from ingredient where food_id like fid and recipe_id like rid;
+
+drop procedure if exists search_nutrient_data;
+create procedure search_nutrient_data(in fid varchar(4), in nid varchar(4))
+	select * from nutrient_data where food_id like fid and nutrient_id like nid;
+    
 /* Populate with demo data */
 /*Nutrients to track */
 insert into daily_nut_requ (nutrient_id, requ) values ('326', 1000);

@@ -21,6 +21,13 @@ def qform_varchar(x):
 def qform_num(x):
     return " '" + str(x) + "'"
 
+def cp_form(x):
+    if x is None:
+        return "%"
+    else:
+        return x
+
+
 def input_name(str):
     name = input(str)
     while not(input_form(name) == 0):
