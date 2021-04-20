@@ -1,6 +1,6 @@
 
 from search import *
-from data_validation import qform_num
+from data_validation import qform_num, cp_form
 import os
 
 def cls():
@@ -13,14 +13,14 @@ def print_nutrient(n):
     print("[ID " + str(n[0]) + "] : " + n[1] + " measured in " + n[2])
 
 #pretty prints single nutritional data
-#[nutrient id, amt, food_id] -> None
+#[nutrient id, food_id, amt] -> None
 def print_nutrient_food_data(cursor, data):
     if data is not None:
         nutrient = search_nutrient(cursor, data[0])
         if nutrient is not None:
             name = nutrient[1]
             units = nutrient[2]
-            print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]) + " " + units)
+            print("[ID " + str(data[0]) + "]" + name + " : " + str(data[2]) + " " + units)
 
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None
@@ -60,6 +60,7 @@ def print_ingredient(cursor, ingredient):
 #prints all the tracked nutritional data for a food item
 # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
 def print_tracked_nutr_food(cursor, food, tracked_nutrients):
+    cls()
     food_id = food[0]
     food_name = food[1]
     print("Per 100 grams, " + food_name + " has:")
@@ -81,6 +82,7 @@ def print_recipe(cursor, recipe):
         for i in ingredients:
             print_ingredient(cursor, i)
         nutr_totals = nutritional_total_recipe(cursor, recipe_id)
+        print("-" * 64)
         for i in nutr_totals:
             print(i[1] + ": " + str(i[2]) + " " + i[3])
     else:
@@ -94,14 +96,13 @@ def print_recipe_list(cursor):
     cls()
     print("RECIPE INDEX")
     print("-" * 64)
-    query = "select recipe_name from recipe"
-    recipes = q_get_list_of_tuples(cursor, query)
+    recipes = cp_get_list_of_tuples(cursor, 'search_recipe', (cp_form(None),))
     if (recipes is None):
         print("You have no recipes yet.")
         return False
     else:
         for r in recipes:
-            print("\t " + str(r[0]))
+            print("\t " + str(r[1]))
         print("-" * 64)
         print("\n \n")
         return True
@@ -111,10 +112,10 @@ def print_recipe_list(cursor):
 # print_meal(cursor, meal) -> None
 def print_meal(cursor, meal):
     from meal import recipe_id_meal
+    from search import search_recipe
     recipe_id = recipe_id_meal(meal)
-    query = "select recipe_name from recipe where recipe_id = " + qform_num(recipe_id)
-    recipe_name = q_get_value(cursor, query, 0)
-    print(str(meal[2]) + " servings of " + recipe_name)
+    recipe = search_recipe(cursor, recipe_id)
+    print(str(meal[2]) + " servings of " + recipe[1])
 
 
 
@@ -138,8 +139,7 @@ def print_plan_list(cursor):
     from plan import plan_name_plan
     print("PLAN LIST")
     print("-" * 64)
-    query = "select * from plan"
-    plans = q_get_list_of_tuples(cursor, query)
+    plans = cp_get_list_of_tuples(cursor, 'search_plan',  (cp_form(None),))
     if (plans is None):
         return False
     else:

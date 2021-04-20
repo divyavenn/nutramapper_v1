@@ -1,6 +1,6 @@
 
 from data_validation import *
-from search import search_nutrient, search_nutrient_data, q_get_list_of_tuples, q_get_tuple
+from search import *
 from print_methods import print_nutrient, print_nutrient_requ, cls
 
 
@@ -18,18 +18,14 @@ def get_nutrient_amount(cursor, food_id, nutrient_id):
     else:
         return x[1]
 
-
-
 #cursor, nutrient_id -> [nutrient_id, nutrient name, daily requirement, units]
 def get_daily_req(cursor, nutrient_id):
-    query = 'select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n where nutrient_id = ' + qform_varchar(nutrient_id)
-    return q_get_tuple(cursor, query)
+    return cp_get_tuple(cursor, 'search_daily_requ', (nutrient_id,))
 
 #gets the list of nutrients that are being tracked along with DV
 # get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
 def get_nutrients_to_track(cursor):
-    query = 'select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n'
-    return q_get_list_of_tuples(cursor, query)
+    return cp_get_list_of_tuples(cursor, 'get_nutrients_to_track', ())
 
 #returns if given nutrient is being tracked
 # cursor, nutrient -> boolean
@@ -82,7 +78,7 @@ def add_nutrients_to_track(cursor, nid):
                 update_nutrients_to_track(cursor, n[0])
         else:
             r = input_number("How many " + n[2] + " would you like to consume daily, on average?")
-            cursor.execute("insert into daily_nut_requ (nutrient_id, requ) values (" + qform_varchar(n[0]) + "," + qform_num(r) + ")")
+            cursor.callproc('add_nutrients_to_track', (n[0], r))
 
 
 def remove_nutrients_to_track(cursor):
@@ -93,7 +89,7 @@ def remove_nutrients_to_track(cursor):
         x = search_nutrient(cursor, None)
         if x is not None:
             if is_part_of_nutrients_to_track(cursor, x):
-                cursor.execute("delete from daily_nut_requ where nutrient_id = " + qform_varchar(x[0]) + "")
+                cursor.callproc('remove_nutrients_to_track', (x[0],))
             else:
                 print("Nutrient is not part of tracked requirements. \n")
         else:

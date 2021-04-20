@@ -75,6 +75,7 @@ def recipe_menu(connection):
         if (print_recipe_list(cursor)):
             if(input_yes("Would you like to update any recipes?")):
                 recipe = search_recipe(cursor, None)
+                print_recipe(cursor, recipe)
                 recipe_update_menu(connection, recipe)
         else:
             input("\n \n Press any key to continue...")
@@ -92,6 +93,7 @@ def recipe_update_menu(connection, recipe):
     cursor = connection.cursor()
     recipe_id = recipe[0]
     recipe = search_recipe(cursor,recipe_id)
+    print_recipe(cursor, recipe)
     if (recipe is None):
         print("This recipe doesn't exist anymore.")
         input("\n \n Press any key to continue...")
@@ -192,6 +194,7 @@ def plan_menu(connection):
         plan_menu(connection)
     elif (choice == 3):
         main_menu(connection)
+
 
 
 def make_menu(opt):

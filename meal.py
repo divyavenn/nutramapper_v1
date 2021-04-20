@@ -19,6 +19,7 @@ def add_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         print_recipe_list(cursor)
         recipe = search_recipe(cursor, None)
+        print_recipe(cursor, recipe)
         if recipe is None:
             print("There are no recipes.")
             return None
@@ -27,11 +28,7 @@ def add_meal(cursor, plan_id, recipe_id):
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if (search_meal(cursor, recipe_id, plan_id) is None):
         amount = input_number("How many servings of this item per week would you like to add?")
-        query = ("insert into meal (recipe_id, plan_id, num_servings) values ("
-                 + qform_num(recipe_id) + ","
-                 + qform_num(plan_id) + ","
-                 + qform_num(amount) + ")")
-        cursor.execute(query)
+        cursor.callproc('add_meal', (recipe_id, plan_id, amount))
     else:
         print("This recipe is already a part of this plan")
         input("\n \n Press any key to continue.")
@@ -41,6 +38,7 @@ def add_meal(cursor, plan_id, recipe_id):
 def remove_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         recipe = search_recipe(cursor, None)
+        print_recipe(cursor, recipe)
         if recipe is None:
             print("There are no recipes.")
             return None
@@ -48,13 +46,13 @@ def remove_meal(cursor, plan_id, recipe_id):
             recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if not (search_meal(cursor, recipe_id, plan_id) is None):
-        query = ("delete from meal where recipe_id =" + qform_num(recipe_id) + " and plan_id = " + qform_num(plan_id))
-        cursor.execute(query)
+        cursor.callproc('remove_meal', (recipe_id, plan_id))
 
 #alter meal if exists, if not give option to add
 #alter_meal(cursor, plan_id, recipe_id/None)-> None
 def alter_meal(cursor, plan_id):
     recipe = search_recipe(cursor, None)
+    print_recipe(cursor, recipe)
     if recipe is None:
         print("There are no recipes.")
         return None

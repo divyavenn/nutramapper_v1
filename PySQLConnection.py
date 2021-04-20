@@ -1,8 +1,6 @@
 from menu import main_menu
-from data_validation import input_form, input_number
 from print_methods import cls
-import pymysql
-from search import *
+from recipe import *
 
 #returns connection
 def try_connect():
@@ -64,15 +62,9 @@ connection = pymysql.connect(host='localhost',
                                      db='meal_plan',
                                      charset='utf8mb4')
 
-cursor = connection.cursor()
-
-x = cp_get_list_of_tuples(cursor, 'search_meal', ("%", 2))
-print(x)
-#main_menu(connection)
-
+main_menu(connection)
 print("Committing changes...\n")
 connection.commit()
-cursor.close()
 print("Closing connection to database...\n")
 connection.close()
 print("Goodbye!\n")

@@ -95,31 +95,87 @@ create table meal(
 
 drop procedure if exists search_nutrient;
 create procedure search_nutrient (in nid nvarchar(4))
-	select nutrient_id, nutrient_name, units from nutrient where nutrient_id = nid;
+	select nutrient_id, nutrient_name, units from nutrient where nutrient_id like nid;
 
 drop procedure if exists search_food_item;
 create procedure search_food_item(in fid nvarchar(5))
-	select food_id, food_name from food_item where food_id = fid;
+	select food_id, food_name from food_item where food_id like fid;
 
 drop procedure if exists search_recipe;
-create procedure search_recipe(in rid int)
-	select recipe_id, recipe_name from recipe where recipe_id = rid;
-
+create procedure search_recipe(in rid varchar(5))
+	select recipe_id, recipe_name from recipe where recipe_id like rid;
+    
+drop procedure if exists remove_recipe;
+create procedure remove_recipe(in rid varchar(5))
+	delete from recipe where recipe_id = rid;
+    
+drop procedure if exists insert_recipe;
+DELIMITER //
+create procedure insert_recipe(in rname varchar(200), out rid int)
+begin
+	insert into recipe (recipe_name) values (rname);
+    select recipe_id from recipe where recipe_name = rname;
+END //
+DELIMITER ;
 drop procedure if exists search_plan;
-create procedure search_plan(in pid int)
-	select plan_id, plan_name, num_days from plan where plan_id = pid;
+create procedure search_plan(in pid varchar(5))
+	select plan_id, plan_name, num_days from plan where plan_id like pid;
 
+drop procedure if exists remove_plan;
+create procedure remove_plan(in pid varchar(5))
+	delete from plan where plan_id like pid;
+
+drop procedure if exists insert_plan;
+DELIMITER //
+create procedure insert_plan(in pname varchar(200), in days int, out pid int)
+begin
+	insert into plan (plan_name, num_days) values (pname, days);
+    select plan_id from plan where plan_name = pname;
+end //
+DELIMITER ;
 drop procedure if exists search_meal;
-create procedure search_meal(in pid varchar(4), in rid varchar(4))
+create procedure search_meal(in pid varchar(5), in rid varchar(5))
 	select * from meal where plan_id like pid and recipe_id like rid;
 
 drop procedure if exists search_ingredient;
-create procedure search_ingredient(in fid varchar(4), in rid varchar(4))
+create procedure search_ingredient(in fid varchar(5), in rid varchar(5))
 	select * from ingredient where food_id like fid and recipe_id like rid;
+    
+drop procedure if exists remove_ingredient;
+create procedure remove_ingredient(in fid varchar(5), in rid varchar(5))
+	delete from ingredient where food_id = fid and recipe_id = rid;
 
+drop procedure if exists add_ingredient;
+create procedure add_ingredient(in fid varchar(5), in rid varchar(5), in amt double)
+	insert into ingredient(food_id, recipe_id, amount_in_grams) values (fid, rid, amt);
+    
 drop procedure if exists search_nutrient_data;
-create procedure search_nutrient_data(in fid varchar(4), in nid varchar(4))
+create procedure search_nutrient_data(in fid varchar(5), in nid varchar(5))
 	select * from nutrient_data where food_id like fid and nutrient_id like nid;
+    
+drop procedure if exists search_daily_requ;
+create procedure search_daily_requ(in nid varchar(5))
+	select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n where nutrient_id = nid;
+
+drop procedure if exists get_nutrients_to_track;
+create procedure get_nutrients_to_track()
+	select n.nutrient_id, n.nutrient_name, d.requ, n.units from daily_nut_requ as d natural join nutrient as n;
+    
+drop procedure if exists add_nutrients_to_track;
+create procedure add_nutrients_to_track(in nid varchar(5), in amt double)
+	insert into daily_nut_requ (nutrient_id, requ) values (nid, amt);
+
+drop procedure if exists remove_nutrients_to_track;
+create procedure remove_nutrients_to_track(in nid varchar(5))
+	delete from daily_nut_requ where (nutrient_id = nid);
+    
+drop procedure if exists add_meal;
+create procedure add_meal(in rid varchar(5), in pid varchar(5), in amt int)
+	insert into meal (recipe_id, plan_id, num_servings) values (rid, pid, amt);
+    
+drop procedure if exists remove_meal;
+create procedure remove_meal(in rid varchar(5), in pid varchar(5))
+	delete from meal where recipe_id = rid and plan_id = pid;
     
 /* Populate with demo data */
 /*Nutrients to track */

@@ -1,5 +1,5 @@
 from ingredient import add_ingredient
-from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples, search_meal
+from search import *
 from nutrient import get_nutrients_to_track, get_nutrient_amount
 from data_validation import *
 import decimal
@@ -30,12 +30,8 @@ def nutritional_total_recipe(cursor, recipe_id):
 # cursor -> None
 def add_recipe(cursor):
     name = input_name("What is the name of this recipe?")
-    query = "insert into recipe (recipe_name) values (" + qform_varchar(name) + ")"
-    cursor.execute(query)
-    recipe_id = None
-     # find recipe_id of new recipe
-    query = ("select recipe_id from recipe where (recipe_name = " + qform_varchar(name) + ")")
-    recipe_id = q_get_value(cursor, query, 0)
+    recipe_id = 0
+    recipe_id = cp_get_value(cursor, 'insert_recipe', (name, recipe_id), 0)
     while (input_yes("Would you like to add an ingredient")):
          add_ingredient(cursor, recipe_id, None)
 
@@ -48,9 +44,10 @@ def rename_recipe(cursor, recipe_id):
 
 # delete_recipe(cursor, recipe_id) -> None
 def delete_recipe(cursor, recipe_id):
-    query = "delete from recipe where recipe_id = " + qform_num(recipe_id)
+    args = (recipe_id,)
+    proc = 'remove_recipe'
     if (search_meal(cursor, recipe_id, None)) is not None:
         if(input_yes("Are you sure? This will delete the recipe from one or more meal plans.")):
-            cursor.execute(query)
+            cursor.callproc(proc, args)
     else:
-        cursor.execute(query)
+        cursor.callproc(proc, args)

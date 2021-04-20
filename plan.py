@@ -1,6 +1,6 @@
 
-from data_validation import input_form, input_name, input_number, input_yes, qform_num, qform_varchar, input_number_not_zero
-from search import q_get_tuple, q_get_list_of_tuples, q_get_value, search_meal, search_plan
+from data_validation import *
+from search import *
 from meal import add_meal
 from nutrient import get_nutrients_to_track
 from recipe import nutritional_total_recipe
@@ -18,21 +18,16 @@ def num_days_plan(plan):
 #cursor -> None
 def add_plan(cursor):
     name = input_name("What is the name of this plan?")
-    days = input_number_not_zero("How many days does this meal plan rstrscover?")
-
-    query = "insert into plan (plan_name, num_days) values ( " + qform_varchar(name) + "," + qform_num(days) + ")"
-    cursor.execute(query)
-    # find recipe_id of new plan
-    query = "select plan_id from plan where (plan_name = " + qform_varchar(name) + ")"
-    plan_id = q_get_value(cursor, query, 0)
+    days = input_number_not_zero("How many days does this meal plan cover?")
+    plan_id = 0
+    plan_id = cp_get_value(cursor, 'insert_plan', (name, days, plan_id), 0)
     while (input_yes("Would you like to add a recipe?")):
         add_meal(cursor, plan_id, None)
 
 #adds a new plan
 #cursor -> None
 def remove_plan(cursor, plan_id):
-    query = "delete from plan where plan_id = " + qform_num(plan_id)
-    cursor.execute(query)
+    cursor.callproc('remove_plan', (plan_id,))
 
 #adds a new plan
 #cursor -> None
