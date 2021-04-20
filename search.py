@@ -25,12 +25,17 @@ def q_get_value(cursor, query, index):
 # Searches for ingredient by name or by specific nid (if not, None), returns nutritional info
 # cursor, nutrient_id/None -> [nutrient_id, nutrient_name, units]
 def search_nutrient(cursor, nid):
+    from print_methods import print_nutrient
     x = []
     if (nid == None):
         x = search(cursor, "Enter a nutrient", "nutrient_id, nutrient_name, units", "nutrient", "nutrient_name", "nutrient_id")
     else:
         query = "select nutrient_id, nutrient_name, units from nutrient where nutrient_id = " + qform_varchar(nid)
         x = q_get_tuple(cursor, query)
+    if x is not None:
+        print_nutrient(cursor, x)
+    else:
+        print("No nutrients found, sorry!")
     return x
 
 # Searches for ingredient by name or through specific food-id
@@ -62,7 +67,7 @@ def search_recipe(cursor, recipe_id):
     if x is not None:
         print_recipe(cursor, x)
     else:
-        print("No recipes, found, sorry!")
+        print("No recipes found, sorry!")
     return x
 
 

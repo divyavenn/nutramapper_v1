@@ -18,7 +18,8 @@ def add_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         recipe = search_recipe(cursor, None)
         recipe_id = recipe[0]
-    if (search_meal(cursor, plan_id, recipe_id) is None):
+    # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
+    if (search_meal(cursor, recipe_id, plan_id) is None):
         amount = input_number("How many servings of this item would you like to add?")
         query = ("insert into meal (recipe_id, plan_id, num_servings) values ("
                  + qform_num(recipe_id) + ","
@@ -34,7 +35,8 @@ def remove_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         recipe_item = search_recipe(cursor, None)
         recipe_id = recipe_item[0]
-    if not (search_meal(cursor, plan_id, recipe_id) is None):
+    # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
+    if not (search_meal(cursor, recipe_id, plan_id) is None):
         query = ("delete from meal where recipe_id =" + qform_num(recipe_id) + " and plan_id = " + qform_num(plan_id))
         cursor.execute(query)
 
