@@ -98,6 +98,7 @@ insert into daily_nut_requ (nutrient_id, requ) values ('303', 14.8);
 insert into daily_nut_requ (nutrient_id, requ) values ('309', 8);
 insert into daily_nut_requ (nutrient_id, requ) values ('401', 90);
 insert into daily_nut_requ (nutrient_id, requ) values ('430', 50);
+insert into daily_nut_requ (nutrient_id, requ) values ('208', 1500);
 
 /*Recipes*/
 insert into recipe (recipe_name) values ('panini');

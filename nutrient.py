@@ -52,7 +52,7 @@ def update_nutrients_to_track(cursor, nid):
         # Nutrient is indeed part of list; can update
         if (is_part):
             r = input_number("How many " + x[2] + " would you like to consume daily, on average?")
-            query = "update daily_nut_requ set requ = " + qform_num(r) + " where nutrient_id = " + qform_varchar(nid)
+            query = "update daily_nut_requ set requ = " + qform_num(r) + " where nutrient_id = " + qform_varchar(x[0])
             cursor.execute(query)
         else:
             print("That nutrient is not part of the daily requirements.\n")
