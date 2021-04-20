@@ -69,8 +69,10 @@ def fulfills_nutritional_requs(cursor, plan_id):
                 recipe_id = recipe_id_meal(m)
                 num_servings = m[2]
                 # nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, name, total_in_recipe, units]
-                t = nutritional_total_recipe(cursor, recipe_id)
-                recipe_totals.append([t[0], t[1], t[2]*num_servings, t[3]])
+                totals = nutritional_total_recipe(cursor, recipe_id)
+                for t in totals:
+                    t[2] = t[2]*decimal.Decimal(num_servings)
+                recipe_totals.append(totals)
             for i in range(0,num_nutr_reqr):
                 sum = 0
                 for r in recipe_totals:
