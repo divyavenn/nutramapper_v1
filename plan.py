@@ -67,8 +67,10 @@ def fulfills_nutritional_requs(cursor, plan_id):
             planwide_avg = [0 for i in range(num_nutr_reqr)]
             for m in meals:
                 recipe_id = recipe_id_meal(m)
+                num_servings = m[2]
                 # nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, name, total_in_recipe, units]
-                recipe_totals.append(nutritional_total_recipe(cursor, recipe_id))
+                t = nutritional_total_recipe(cursor, recipe_id)
+                recipe_totals.append([t[0], t[1], t[2]*num_servings, t[3]])
             for i in range(0,num_nutr_reqr):
                 sum = 0
                 for r in recipe_totals:

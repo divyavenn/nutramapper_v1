@@ -126,7 +126,7 @@ def plan_update_menu(cursor, plan):
     plan_id = plan[0]
     cls()
     print_plan(cursor, plan)
-    if input_yes("Would you like to update this plan?"):
+    if input_yes("\n \n Would you like to update this plan?"):
         options = ['Add Recipe To Plan',
                    'Remove Recipe From Plan',
                    'Change Number of Days This Plan covers',
@@ -136,21 +136,27 @@ def plan_update_menu(cursor, plan):
                    'Return to Main Menu']
         choice = make_menu(options)
         if (choice == 1):
+            cls()
             add_meal(cursor, plan_id, None)
             plan_update_menu(cursor, plan)
         elif (choice == 2):
+            cls()
             remove_meal(cursor, plan_id, None)
             plan_update_menu(cursor, plan)
         elif (choice == 3):
+            cls()
             change_plan_days(cursor, plan_id)
             plan_update_menu(cursor, plan)
         elif (choice == 4):
+            cls()
             alter_meal(cursor, plan_id)
             plan_update_menu(cursor, plan)
         elif (choice == 5):
+            cls()
             rename_plan(cursor, plan_id)
             plan_update_menu(cursor, plan)
         elif (choice == 6):
+            cls()
             remove_plan(cursor, plan_id)
             plan_menu(cursor)
         elif (choice == 7):

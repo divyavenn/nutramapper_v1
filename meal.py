@@ -26,7 +26,7 @@ def add_meal(cursor, plan_id, recipe_id):
             recipe_id = recipe[0]
     # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     if (search_meal(cursor, recipe_id, plan_id) is None):
-        amount = input_number("How many servings of this item would you like to add?")
+        amount = input_number("How many servings of this item per week would you like to add?")
         query = ("insert into meal (recipe_id, plan_id, num_servings) values ("
                  + qform_num(recipe_id) + ","
                  + qform_num(plan_id) + ","
