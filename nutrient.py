@@ -1,7 +1,7 @@
 
 from data_validation import *
 from search import search_nutrient, search_nutrient_data, q_get_list_of_tuples, q_get_tuple
-from print_methods import print_nutrient, print_nutrient_requ
+from print_methods import print_nutrient, print_nutrient_requ, cls
 
 
 #NUTRIENT DATA: [nutrient id, amt, food_id]
@@ -55,6 +55,7 @@ def update_nutrients_to_track(cursor, nid):
             query = "update daily_nut_requ set requ = " + qform_num(r) + " where nutrient_id = " + qform_varchar(x[0])
             cursor.execute(query)
         else:
+            cls()
             print("That nutrient is not part of the daily requirements.\n")
             print_nutrient(x)
             if input_yes("Would you like to add it?"):
@@ -67,12 +68,13 @@ def update_nutrients_to_track(cursor, nid):
 def add_nutrients_to_track(cursor, nid):
     # cursor, food_id/None, nutrient_id/None -> [nutrient id, amt, food_id]
     n = search_nutrient(cursor, nid)
-    if x is None:
+    if n is None:
         print("Nutrient does not exist.")
         return None
     else:
         is_part = is_part_of_nutrients_to_track(cursor, n)
         if (is_part):
+            cls()
             print("That nutrient is already part of the daily requirements.\n")
             daily_requ = get_daily_req(cursor, n[0])
             print_nutrient_requ(daily_requ)

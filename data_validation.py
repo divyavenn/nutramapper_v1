@@ -35,6 +35,14 @@ def input_number(str):
         return input_number(str)
     return num
 
+def input_number_not_zero(str):
+    num = input_number(str)
+    if (int(num) == 0):
+        print("You cannot set this value to zero. Try again.")
+        return input_number_not_zero(str)
+    else:
+        return num
+
 def input_yes(str):
     affirmatives = set("yes" + "y" + "ok" + "okay" + "sure")
     negatives = set("no" + "n")

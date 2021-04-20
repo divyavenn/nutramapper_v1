@@ -22,38 +22,30 @@ def main_menu(cursor):
         plan_menu(cursor)
 
 def nutrient_menu(cursor):
-    cls()
-    options = ['View Nutrient Requirements',
-              'Add Nutrient Requirement to Track',
-              'Update Nutrient Requirement',
-              'Remove Nutrient Requirement Tracked',
-              'Return to Main Menu']
-    choice = make_menu(options)
-    if (choice == 1):
+    print_nutrient_requ_list(cursor)
+    if (input_yes("\n \n Would you like to change which nutrients are tracked \n or update the nutrient requirements?")):
         cls()
-        nutr_to_track = get_nutrients_to_track(cursor)
-        if (nutr_to_track is not None):
-            print("Nutrients requirements being monitored: \n")
-            for n in nutr_to_track:
-                print_nutrient_requ(n)
-        else:
-            print("No nutrients are currently being tracked.")
-        input("\n \n Press any key to continue.")
-        nutrient_menu(cursor)
-    elif (choice == 2):
-        cls()
-        add_nutrients_to_track(cursor, None)
-        cursor.execute("commit")
-        nutrient_menu(cursor)
-    elif (choice == 3):
-        cls()
-        update_nutrients_to_track(cursor, None)
-        nutrient_menu(cursor)
-    elif (choice == 4):
-        cls()
-        remove_nutrients_to_track(cursor)
-        nutrient_menu(cursor)
-    elif (choice == 5):
+        options = ['Add Nutrient Requirement to Track',
+                  'Update Nutrient Requirement',
+                  'Remove Nutrient Requirement Tracked',
+                  'Return to Main Menu']
+        choice = make_menu(options)
+        if (choice == 1):
+            cls()
+            add_nutrients_to_track(cursor, None)
+            cursor.execute("commit")
+            nutrient_menu(cursor)
+        elif (choice == 2):
+            cls()
+            update_nutrients_to_track(cursor, None)
+            nutrient_menu(cursor)
+        elif (choice == 3):
+            cls()
+            remove_nutrients_to_track(cursor)
+            nutrient_menu(cursor)
+        elif (choice == 4):
+            main_menu(cursor)
+    else:
         main_menu(cursor)
 
 def food_item_menu(cursor):
@@ -93,9 +85,13 @@ def recipe_menu(cursor):
 
 
 def recipe_update_menu(cursor, recipe):
-    recipe_id = recipe[0]
     cls()
-    print_recipe(cursor, recipe)
+    recipe_id = recipe[0]
+    recipe = search_recipe(cursor,recipe_id)
+    if (recipe is None):
+        print("This recipe doesn't exist anymore.")
+        input("\n \n Press any key to continue...")
+        recipe_menu(cursor)
     if input_yes("Would you like to update this recipe?"):
         options = ['Alter Ingredient Quantity',
                    'Add Ingredient',
@@ -123,8 +119,13 @@ def recipe_update_menu(cursor, recipe):
             main_menu(cursor)
 
 def plan_update_menu(cursor, plan):
-    plan_id = plan[0]
     cls()
+    plan_id = plan[0]
+    plan = search_plan(cursor, plan_id)
+    if(plan is None):
+        print("This plan doesn't exist anymore.")
+        input("\n \n Press any key to continue...")
+        plan_menu(cursor)
     print_plan(cursor, plan)
     if input_yes("\n \n Would you like to update this plan?"):
         options = ['Add Recipe To Plan',

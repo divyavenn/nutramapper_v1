@@ -1,5 +1,5 @@
 
-from data_validation import input_form, input_name, input_number, input_yes, qform_num, qform_varchar
+from data_validation import input_form, input_name, input_number, input_yes, qform_num, qform_varchar, input_number_not_zero
 from search import q_get_tuple, q_get_list_of_tuples, q_get_value, search_meal, search_plan
 from meal import add_meal
 from nutrient import get_nutrients_to_track
@@ -18,7 +18,7 @@ def num_days_plan(plan):
 #cursor -> None
 def add_plan(cursor):
     name = input_name("What is the name of this plan?")
-    days = input_number("How many days does this meal plan cover?")
+    days = input_number_not_zero("How many days does this meal plan rstrscover?")
 
     query = "insert into plan (plan_name, num_days) values ( " + qform_varchar(name) + "," + qform_num(days) + ")"
     cursor.execute(query)
@@ -37,15 +37,16 @@ def remove_plan(cursor, plan_id):
 #adds a new plan
 #cursor -> None
 def change_plan_days(cursor, plan_id):
-    days = input_number("What number of days should this plan cover?")
+    days = input_number_not_zero("What number of days should this plan cover?")
     query = "update plan set num_days = " + qform_num(days) + "where plan_id = " + qform_num(plan_id)
     cursor.execute(query)
 
 #adds a new plan
 #cursor -> None
 def rename_plan(cursor, plan_id):
-    new_name = input_name("Enter a new name for the recipe")
-    query = "update recipe set plan_name = " + qform_varchar(new_name )+ "where plan_id = " + qform_num(plan_id)
+    new_name = input_name("Enter a new name for the plan")
+    print(qform_num(plan_id))
+    query = "update plan set plan_name = " + qform_varchar(new_name) + "where plan_id = " + qform_num(plan_id)
     cursor.execute(query)
 
 def fulfills_nutritional_requs(cursor, plan_id):

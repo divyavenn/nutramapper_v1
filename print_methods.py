@@ -26,6 +26,23 @@ def print_nutrient_food_data(cursor, data):
 def print_nutrient_requ(n):
     print("[ID " + str(n[0]) + "] : " + n[1] + " has a daily requirement of " + str(n[2]) + " " + n[3])
 
+# pretty-prints single nutrient requirements
+# cursor -> none
+def print_nutrient_requ_list(cursor):
+    from nutrient import get_nutrients_to_track
+    cls()
+    nutr_to_track = get_nutrients_to_track(cursor)
+    if (nutr_to_track is not None):
+        print("NUTRIENTS TRACKED")
+        print("-"*64)
+        for n in nutr_to_track:
+            print_nutrient_requ(n)
+    else:
+        print("-" * 64)
+        print("**No nutrients are currently being tracked.**")
+    print("-" * 64)
+
+
 
 
 #pretty prints the ingredient
@@ -106,7 +123,7 @@ def print_plan(cursor, plan):
     # cursor, plan_id/None -> [plan_id, plan_name, num_days]
     meals = search_meal(cursor, None, plan_id)
     if meals is not None:
-        print("Plan " + str(plan[1]) + " covers " + str(plan[2]) + " days and has: \n")
+        print("Plan " + plan[1] + " covers " + str(plan[2]) + " days and has: \n")
         print("-" * 64)
         for m in meals:
             print_meal(cursor, m)
