@@ -1,6 +1,6 @@
 from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
 from search import search_recipe, search_meal, q_get_tuple, q_get_list_of_tuples
-from recipe import print_recipe
+from print_methods import print_recipe
 
 #MEAL [recipe_id, plan_id, num_servings]
 
@@ -17,7 +17,6 @@ def num_servings_meal(meal):
 def add_meal(cursor, plan_id, recipe_id):
     if recipe_id is None:
         recipe = search_recipe(cursor, None)
-        print_recipe(recipe)
         recipe_id = recipe[0]
     if (search_meal(cursor, plan_id, recipe_id) is None):
         amount = input_number("How many servings of this item would you like to add?")
@@ -44,8 +43,10 @@ def remove_meal(cursor, plan_id, recipe_id):
 def alter_meal(cursor, plan_id):
     recipe = search_recipe(cursor, None)
     recipe_id = recipe[0]
-    if (search_meal(cursor, plan_id, recipe_id) is None):
-        if(input_yes("Would you like to add this recipe to the plan?")):
+    print_recipe(cursor, recipe)
+    # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
+    if (search_meal(cursor, recipe_id, plan_id) is None):
+        if(input_yes("This recipe is not part of the plan. Would you like to add it?")):
             add_meal(cursor, plan_id, recipe_id)
     else:
         new_amt = input_number('What would you like to change the number of servings to?')

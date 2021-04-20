@@ -5,6 +5,7 @@ from recipe import *
 from search import *
 from ingredient import *
 from plan import *
+from meal import *
 def main_menu(cursor):
     options = ['View/Edit Tracked Nutrients',
                'View/Edit Food Items',
@@ -53,7 +54,10 @@ def food_item_menu(cursor):
     if (choice == 1):
         #search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
         food = search_food_item(cursor, None)
-        print_tracked_nutr_food(cursor, food[0])
+        # get_nutrients_to_track(cursor) -> [nutrient_id, nutrient name, daily requirement, units]
+        nutrients_to_track = get_nutrients_to_track(cursor)
+        # print_tracked_nutr_food(cursor, food, tracked_nutrients) -> None
+        print_tracked_nutr_food(cursor, food, nutrients_to_track)
         food_item_menu(cursor)
     elif (choice == 2):
         main_menu(cursor)
@@ -102,14 +106,32 @@ def recipe_update_menu(cursor, recipe_id):
             main_menu(cursor)
 
 def plan_update_menu(cursor, plan_id):
-    options = ['Add Meal',
-               'Remove Meal',
-               'Update number of servings',
-               'Rename Plan',
-               'Delete Plan',
-               'Return to Main Menu']
+    if input_yes("Would you like to update this plan?"):
+        options = ['Add Recipe To Plan',
+                   'Remove Recipe From Plan',
+                   'Change Number of Days This Plan covers',
+                   'Update Number of Servings of a Recipe',
+                   'Rename Plan',
+                   'Delete Plan',
+                   'Return to Main Menu']
+        choice = make_menu(options)
+        if (choice == 1):
+            add_meal(cursor, plan_id, None)
+        elif (choice == 2):
+            remove_meal(cursor, plan_id, None)
+        elif (choice == 3):
+            change_plan_days(cursor, plan_id)
+        elif (choice == 4):
+            alter_meal(cursor, plan_id)
+        elif (choice == 5):
+            rename_plan(cursor, plan_id)
+        elif (choice == 6):
+            remove_plan(cursor, plan_id)
+        elif (choice == 7):
+            main_menu(cursor)
 
-def plan_menu(cursor, choice):
+def plan_menu(cursor):
+    choice = None
     if (choice is None):
         options = ['View/Update Meal Plan',
                    'Create New Meal Plan',
@@ -123,10 +145,10 @@ def plan_menu(cursor, choice):
             plan = search_plan(cursor, None)
             print_plan(cursor, plan[0])
             plan_update_menu(cursor, plan[0])
-        plan_menu(cursor, None)
+        plan_menu(cursor)
     elif (choice == 2):
         add_plan(cursor)
-        plan_menu(cursor, None)
+        plan_menu(cursor)
     elif (choice == 3):
         main_menu(cursor)
 

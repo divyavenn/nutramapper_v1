@@ -4,6 +4,7 @@ from search import q_get_tuple, q_get_list_of_tuples, q_get_value, search_meal, 
 from meal import add_meal
 from nutrient import get_nutrients_to_track
 from recipe import nutritional_total_recipe
+import decimal
 
 #PLAN = [plan_id, plan_name, num_days]
 def plan_id_plan(plan):
@@ -47,8 +48,9 @@ def rename_plan(cursor, plan_id):
     query = "update recipe set plan_name = " + qform_varchar(new_name )+ "where plan_id = " + qform_num(plan_id)
     cursor.execute(query)
 
-
 def fulfills_nutritional_requs(cursor, plan_id):
+    from meal import recipe_id_meal
+    # cursor, recipe_id/None, plan_id/None -> [recipe_id, plan_id, num_servings]/None
     meals = search_meal(cursor, None, plan_id)
     plan = search_plan(cursor, plan_id)
     if not meals is None:
@@ -57,20 +59,23 @@ def fulfills_nutritional_requs(cursor, plan_id):
         nutrients = get_nutrients_to_track(cursor)
         for n in nutrients:
             daily_reqs.append(n[2])
+        #for each recipe, holds info for each nutrient total
         recipe_totals = []
-        planwide_avg = []
-        num_days = num_days_plan(plan_id)
+        num_days = num_days_plan(plan)
+        num_nutr_reqr = len(daily_reqs)
+        planwide_avg = [0 for i in range(num_nutr_reqr)]
         for m in meals:
-            recipe_id = m[0]
+            recipe_id = recipe_id_meal(m)
+            # nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, name, total_in_recipe, units]
             recipe_totals.append(nutritional_total_recipe(cursor, recipe_id))
-        for i in range(0,len(daily_reqs)):
+        for i in range(0,num_nutr_reqr):
             sum = 0
             for r in recipe_totals:
-                sum = sum + r[i]
-            planwide_avg[i] = sum/num_days
+                sum = sum + r[i][2]
+            planwide_avg[i] = decimal.Decimal(sum)/decimal.Decimal(num_days)
             if planwide_avg[i] < daily_reqs[i]:
-                diff = daily_reqs[i] - planwide_avg[i]
-                print("You miss your goal for " + nutrients[i][2] + " by an average of: \n" + str(diff) + " " + nutrients[i][3] + " per day.")
+                diff = round(daily_reqs[i] - planwide_avg[i],1)
+                print("You miss your goal for " + str(nutrients[i][1]) + " by an average of: \n" + str(diff) + " " + str(nutrients[i][3]) + " per day.")
             elif planwide_avg[i] > daily_reqs[i]:
-                surplus = planwide_avg[i] - daily_reqs[i]
-                print("You exceed your goal for " + nutrients[i][2] + " by an average of: \n" + str(surplus) + " " + nutrients[i][3] + " per day.")
+                surplus = round(planwide_avg[i] - daily_reqs[i],1)
+                print("You exceed your goal for " + str(nutrients[i][1]) + " by an average of: \n" + str(surplus) + " " + str(nutrients[i][3]) + " per day.")

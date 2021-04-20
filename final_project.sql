@@ -27,8 +27,7 @@ alter table nutrient
 add primary key (nutrient_id);
 
 alter table food_item 
-add primary key (food_id),
-add cost_per_100g double;
+add primary key (food_id);
 
 alter table nutrient_data
 modify column nutrient_id varchar(4),

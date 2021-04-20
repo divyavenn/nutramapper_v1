@@ -2,9 +2,10 @@ from ingredient import add_ingredient
 from search import search_recipe, search_ingredient, q_get_value, q_get_tuple, q_get_list_of_tuples
 from nutrient import get_nutrients_to_track, get_nutrient_amount
 from data_validation import input_form, qform_varchar, qform_num, input_name, input_number, input_yes
+import decimal
 
 #adds up the total amounts for each nutrient of each food item in a recipe
-#nutritional_total_recipe(cursor, recipe_id) -> [id, name, total_in_recipe, units]
+#nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, nutrient_name, total_in_recipe, units]
 def nutritional_total_recipe(cursor, recipe_id):
     nutr_reqs = get_nutrients_to_track(cursor)
     #search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
@@ -17,7 +18,7 @@ def nutritional_total_recipe(cursor, recipe_id):
             grams = n[2]
             # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
             amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
-            total = total + grams*amount_per_100_grams/100
+            total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
         # [nutrient id, nutrient name, total in recipe, units]
         nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
     return nutr_totals

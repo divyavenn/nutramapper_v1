@@ -1,7 +1,7 @@
 
 from data_validation import qform_varchar, qform_num
 from search import search_nutrient, search_nutrient_data
-from print_methods import print_nutrient
+from print_methods import print_nutrient, print_nutrient_requ
 
 #NUTRIENT DATA: [nutrient id, amt, food_id]
 #DAILY_REQS: [nutrient_id, nutrient name, daily requirement, units]
@@ -12,7 +12,7 @@ from print_methods import print_nutrient
 def get_nutrient_amount(cursor, food_id, nutrient_id):
     #cursor, food_id, nutrient_id/None -> [nutrient id, amt, food_id]
     x = search_nutrient_data(cursor, food_id, nutrient_id)
-    if (len(x) == 0):
+    if (x is None):
         return 0
     else:
         return x[1]

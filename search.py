@@ -9,6 +9,7 @@ def q_get_tuple(cursor, query):
         return check_exists(i)
 def q_get_list_of_tuples(cursor, query):
     list = []
+    cursor.execute(query)
     for i in cursor:
         list.append(i)
     return check_exists(list)
@@ -33,15 +34,15 @@ def search_nutrient(cursor, nid):
     return x
 
 # Searches for ingredient by name or through specific food-id
-# search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
+# search_food_item(cursor, food_id/None) -> [food_id, food_name]
 def search_food_item(cursor, food_id):
     x = []
-    output_fields = "food_id, food_name, cost_per_100g"
+    output_fields = "food_id, food_name"
     table = "food_item"
     if (food_id is None):
         x = search(cursor, "Enter a food item", output_fields, table, "food_id")
     else:
-        query = "select " + output_fields + " from " + table + "where food_id = " + qform_varchar(food_id)
+        query = "select " + output_fields + " from " + table + " where food_id = " + qform_varchar(food_id)
         x = q_get_tuple(cursor, query)
     return x
 
@@ -49,6 +50,7 @@ def search_food_item(cursor, food_id):
 # Searches for recipe by name or through specific recipe_id
 # cursor, recipe_id/None -> [recipe_id, recipe_name]
 def search_recipe(cursor, recipe_id):
+    from print_methods import print_recipe
     x = []
     output_fields = "recipe_id, recipe_name"
     table = "recipe"
@@ -57,6 +59,10 @@ def search_recipe(cursor, recipe_id):
     else:
         query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id)
         x = q_get_tuple(cursor, query)
+    if x is not None:
+        print_recipe(cursor, x)
+    else:
+        print("No recipes, found, sorry!")
     return x
 
 
@@ -106,13 +112,13 @@ def search_meal(cursor, recipe_id, plan_id):
     output_fields = "recipe_id, plan_id, num_servings"
     table = "meal"
     if recipe_id is not None and plan_id is None:
-        query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_varchar(recipe_id)
+        query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id)
         return q_get_list_of_tuples(cursor, query)
     elif recipe_id is None and plan_id is not None:
-        query = query = "select " + output_fields + " from " + table + " where plan_id = " + qform_varchar(plan_id)
+        query = "select " + output_fields + " from " + table + " where plan_id = " + qform_num(plan_id)
         return q_get_list_of_tuples(cursor, query)
-    elif recipe_id  is not None and plan_id is not None:
-        query = query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_varchar(recipe_id) + " and plan_id = " + qform_varchar(plan_id) + ""
+    elif recipe_id is not None and plan_id is not None:
+        query = "select " + output_fields + " from " + table + " where recipe_id = " + qform_num(recipe_id) + " and plan_id = " + qform_num(plan_id)
         return q_get_tuple(cursor, query)
 
 #Searches for a unique result using user input. performs data validation to avoid SQL errors
@@ -127,7 +133,7 @@ def search(cursor, dialogue, allCols, table, name_Col, id_Col):
         print("Invalid input")
         return search(cursor, dialogue, allCols, table, name_Col, id_Col)
     elif(form == 0):
-        query = "select " + allCols + " from " + table + " where " + name_Col + " like '" + x + "%'"
+        query = "select " + allCols + " from " + table + " where " + name_Col + " like '%" + x + "%'"
         if (cursor.execute(query) == 1):
             for i in cursor:
                 return i
