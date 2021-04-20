@@ -62,7 +62,6 @@ def print_recipe(cursor, recipe):
     if ingredients is not None:
         for i in ingredients:
             print_ingredient(cursor, i)
-        print("Nutritional Info:")
         nutr_totals = nutritional_total_recipe(cursor, recipe_id)
         for i in nutr_totals:
             print(i[1] + ": " + str(i[2]) + " " + i[3])
@@ -79,6 +78,7 @@ def print_recipe_list(cursor):
     query = "select recipe_name from recipe"
     recipes = q_get_list_of_tuples(cursor, query)
     if (recipes is None):
+        print("You have no recipes yet.")
         return False
     else:
         for r in recipes:

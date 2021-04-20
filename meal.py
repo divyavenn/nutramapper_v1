@@ -17,7 +17,7 @@ def num_servings_meal(meal):
 def add_meal(cursor, plan_id, recipe_id):
     from print_methods import print_recipe_list
     if recipe_id is None:
-        print_recipe_list()
+        print_recipe_list(cursor)
         recipe = search_recipe(cursor, None)
         if recipe is None:
             print("There are no recipes.")

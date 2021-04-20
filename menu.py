@@ -78,8 +78,11 @@ def recipe_menu(cursor):
     choice = make_menu(options)
     if (choice == 1):
         if (print_recipe_list(cursor)):
-            recipe = search_recipe(cursor, None)
-            recipe_update_menu(cursor, recipe)
+            if(input_yes("Would you like to update any recipes?")):
+                recipe = search_recipe(cursor, None)
+                recipe_update_menu(cursor, recipe)
+        else:
+            input("\n \n Press any key to continue...")
         recipe_menu(cursor)
     elif (choice == 2):
         cls()
