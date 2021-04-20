@@ -19,7 +19,8 @@ def print_nutrient_food_data(cursor, data):
         nutrient = search_nutrient(cursor, data[0])
         if nutrient is not None:
             name = nutrient[1]
-            print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]))
+            units = nutrient[2]
+            print("[ID " + str(data[0]) + "]" + name + " : " + str(data[1]) + " " + units)
 
 # pretty-prints single nutrient requirements
 # [nutrient_id, nutrient name, daily requirement, units] -> None

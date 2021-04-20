@@ -57,7 +57,7 @@ print("Connection successful! Ready to start?")
 
 input("\n \n \n Press any key to continue...")
 cls()
-main_menu(cursor)
+main_menu(connection)
 
 print("Committing changes...\n")
 connection.commit()

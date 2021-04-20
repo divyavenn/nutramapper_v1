@@ -5,7 +5,7 @@ from ingredient import *
 from plan import *
 from meal import *
 
-def main_menu(cursor):
+def main_menu(connection):
     cls()
     options = ['View/Edit Tracked Nutrients',
                'View Information for a Food Item',
@@ -13,15 +13,16 @@ def main_menu(cursor):
                'View/Edit Plans']
     choice = make_menu(options)
     if (choice == 1):
-        nutrient_menu(cursor)
+        nutrient_menu(connection)
     elif (choice == 2):
-        food_item_menu(cursor)
+        food_item_menu(connection)
     elif (choice == 3):
-        recipe_menu(cursor)
+        recipe_menu(connection)
     elif (choice == 4):
-        plan_menu(cursor)
+        plan_menu(connection)
 
-def nutrient_menu(cursor):
+def nutrient_menu(connection):
+    cursor = connection.cursor()
     print_nutrient_requ_list(cursor)
     if (input_yes("\n \n Would you like to change which nutrients are tracked \n or update the nutrient requirements?")):
         cls()
@@ -34,21 +35,22 @@ def nutrient_menu(cursor):
             cls()
             add_nutrients_to_track(cursor, None)
             cursor.execute("commit")
-            nutrient_menu(cursor)
+            nutrient_menu(connection)
         elif (choice == 2):
             cls()
             update_nutrients_to_track(cursor, None)
-            nutrient_menu(cursor)
+            nutrient_menu(connection)
         elif (choice == 3):
             cls()
             remove_nutrients_to_track(cursor)
-            nutrient_menu(cursor)
+            nutrient_menu(connection)
         elif (choice == 4):
-            main_menu(cursor)
+            main_menu(connection)
     else:
-        main_menu(cursor)
+        main_menu(connection)
 
-def food_item_menu(cursor):
+def food_item_menu(connection):
+    cursor = connection.cursor()
     cls()
     #search_food_item(cursor, food_id/None) -> [food_id, food_name, cost_per_100]
     food = search_food_item(cursor, None)
@@ -60,10 +62,11 @@ def food_item_menu(cursor):
     else:
         print("No nutrients are being tracked.")
     input("\n \n Press any key to return to the main menu.")
-    main_menu(cursor)
+    main_menu(connection)
 
-def recipe_menu(cursor):
+def recipe_menu(connection):
     cls()
+    cursor = connection.cursor()
     options = ['View/Update Recipes',
               'Create New Recipe',
                'Return To Main Menu']
@@ -72,26 +75,27 @@ def recipe_menu(cursor):
         if (print_recipe_list(cursor)):
             if(input_yes("Would you like to update any recipes?")):
                 recipe = search_recipe(cursor, None)
-                recipe_update_menu(cursor, recipe)
+                recipe_update_menu(connection, recipe)
         else:
             input("\n \n Press any key to continue...")
-        recipe_menu(cursor)
+        recipe_menu(connection)
     elif (choice == 2):
         cls()
         add_recipe(cursor)
-        recipe_menu(cursor)
+        recipe_menu(connection)
     elif (choice == 3):
-        main_menu(cursor)
+        main_menu(connection)
 
 
-def recipe_update_menu(cursor, recipe):
+def recipe_update_menu(connection, recipe):
     cls()
+    cursor = connection.cursor()
     recipe_id = recipe[0]
     recipe = search_recipe(cursor,recipe_id)
     if (recipe is None):
         print("This recipe doesn't exist anymore.")
         input("\n \n Press any key to continue...")
-        recipe_menu(cursor)
+        recipe_menu(connection)
     if input_yes("Would you like to update this recipe?"):
         options = ['Alter Ingredient Quantity',
                    'Add Ingredient',
@@ -102,30 +106,31 @@ def recipe_update_menu(cursor, recipe):
         choice = make_menu(options)
         if (choice == 1):
             alter_ingredient(cursor, recipe_id, None)
-            recipe_update_menu(cursor,recipe)
+            recipe_update_menu(connection,recipe)
         elif(choice == 2):
             add_ingredient(cursor, recipe_id, None)
-            recipe_update_menu(cursor,recipe)
+            recipe_update_menu(connection,recipe)
         elif(choice==3):
             remove_ingredient(cursor, recipe_id, None)
-            recipe_update_menu(cursor, recipe)
+            recipe_update_menu(connection, recipe)
         elif (choice == 4):
             rename_recipe(cursor, recipe_id)
-            recipe_update_menu(cursor, recipe)
+            recipe_update_menu(connection, recipe)
         elif (choice==5):
             delete_recipe(cursor, recipe_id)
-            recipe_menu(cursor)
+            recipe_menu(connection)
         elif(choice==6):
-            main_menu(cursor)
+            main_menu(connection)
 
-def plan_update_menu(cursor, plan):
+def plan_update_menu(connection, plan):
+    cursor = connection.cursor()
     cls()
     plan_id = plan[0]
     plan = search_plan(cursor, plan_id)
     if(plan is None):
         print("This plan doesn't exist anymore.")
         input("\n \n Press any key to continue...")
-        plan_menu(cursor)
+        plan_menu(connection)
     print_plan(cursor, plan)
     if input_yes("\n \n Would you like to update this plan?"):
         options = ['Add Recipe To Plan',
@@ -139,31 +144,32 @@ def plan_update_menu(cursor, plan):
         if (choice == 1):
             cls()
             add_meal(cursor, plan_id, None)
-            plan_update_menu(cursor, plan)
+            plan_update_menu(connection, plan)
         elif (choice == 2):
             cls()
             remove_meal(cursor, plan_id, None)
-            plan_update_menu(cursor, plan)
+            plan_update_menu(connection, plan)
         elif (choice == 3):
             cls()
             change_plan_days(cursor, plan_id)
-            plan_update_menu(cursor, plan)
+            plan_update_menu(connection, plan)
         elif (choice == 4):
             cls()
             alter_meal(cursor, plan_id)
-            plan_update_menu(cursor, plan)
+            plan_update_menu(connection, plan)
         elif (choice == 5):
             cls()
             rename_plan(cursor, plan_id)
-            plan_update_menu(cursor, plan)
+            plan_update_menu(connection, plan)
         elif (choice == 6):
             cls()
             remove_plan(cursor, plan_id)
-            plan_menu(cursor)
+            plan_menu(connection)
         elif (choice == 7):
-            main_menu(cursor)
+            main_menu(connection)
 
-def plan_menu(cursor):
+def plan_menu(connection):
+    cursor = connection.cursor()
     cls()
     choice = None
     if (choice is None):
@@ -178,14 +184,14 @@ def plan_menu(cursor):
                 add_plan(cursor)
         else:
             plan = search_plan(cursor, None)
-            plan_update_menu(cursor, plan)
-        plan_menu(cursor)
+            plan_update_menu(connection, plan)
+        plan_menu(connection)
     elif (choice == 2):
         cls()
         add_plan(cursor)
-        plan_menu(cursor)
+        plan_menu(connection)
     elif (choice == 3):
-        main_menu(cursor)
+        main_menu(connection)
 
 
 def make_menu(opt):
