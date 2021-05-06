@@ -4,6 +4,18 @@ from nutrient import get_nutrients_to_track, get_nutrient_amount
 from data_validation import *
 import decimal
 
+
+#finds the total grams in the recipe
+#total_grams(cursor, recipe_id) -> grams
+def total_grams(cursor, recipe_id):
+    total = 0
+    # search_ingredient(cursor, food_id/None, recipe_id/None) -> [food_id, recipe_id, amount_in_grams]
+    ingredients = search_ingredient(cursor, None, recipe_id)
+    if ingredients is not None:
+        for n in ingredients:
+            grams = n[2]
+            total = total + grams
+    return total
 #adds up the total amounts for each nutrient of each food item in a recipe
 #nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, nutrient_name, total_in_recipe, units]
 def nutritional_total_recipe(cursor, recipe_id):
@@ -21,8 +33,8 @@ def nutritional_total_recipe(cursor, recipe_id):
                     # get_nutrient_amount(cursor, food_id, nutrient_id/None) -> [nutrient id, amt, food_id]
                     amount_per_100_grams = (get_nutrient_amount(cursor, food_id, nutrient[0]))
                     total = total + decimal.Decimal(grams) * decimal.Decimal(amount_per_100_grams)/100
-                # [nutrient id, nutrient name, total in recipe, units]
-                nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
+                #[nutrient id, nutrient name, total in recipe, units]
+            nutr_totals.append([nutrient[0], nutrient[1], total, nutrient[3]])
     return nutr_totals
 
 

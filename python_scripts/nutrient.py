@@ -4,19 +4,19 @@ from search import *
 from print_methods import print_nutrient, print_nutrient_requ, cls
 
 
-#NUTRIENT DATA: [nutrient id, amt, food_id]
+#NUTRIENT DATA: [nutrient id, food_id, amt]
 #DAILY_REQS: [nutrient_id, nutrient name, daily requirement, units]
 #NUTRIENT: [nutrient_id, nutrient_name, units]
 
 # gets amount of nutrient in food item
-# cursor, food_id, nutrient_id/None -> [nutrient id, amt, food_id]
+# cursor, food_id, nutrient_id/None -> amt
 def get_nutrient_amount(cursor, food_id, nutrient_id):
     #cursor, food_id, nutrient_id/None -> [nutrient id, amt, food_id]
     x = search_nutrient_data(cursor, food_id, nutrient_id)
     if (x is None):
         return 0
     else:
-        return x[1]
+        return x[2]
 
 #cursor, nutrient_id -> [nutrient_id, nutrient name, daily requirement, units]
 def get_daily_req(cursor, nutrient_id):

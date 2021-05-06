@@ -201,7 +201,7 @@ def make_menu(opt):
     loop = True
     while loop:
         print_menu(opt)
-        x = input_number("Enter your choice " + str(1) + " to " + str(len(opt)))
+        x = input_number("Enter your choice " + str(1) + " to " + str(len(opt)) + "  \n")
         for i in range(1, len(opt ) + 1):
             if x == str(i):
                 return i

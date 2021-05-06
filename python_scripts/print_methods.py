@@ -72,7 +72,7 @@ def print_tracked_nutr_food(cursor, food, tracked_nutrients):
 #pretty prints recipe
 #print_recipe(cursor, recipe_id) -> None
 def print_recipe(cursor, recipe):
-    from recipe import nutritional_total_recipe
+    from recipe import nutritional_total_recipe, total_grams
     recipe_id = recipe[0]
     name = recipe[1]
     ingredients = search_ingredient(cursor, None, recipe_id)
@@ -81,10 +81,13 @@ def print_recipe(cursor, recipe):
     if ingredients is not None:
         for i in ingredients:
             print_ingredient(cursor, i)
+        # nutritional_total_recipe(cursor, recipe_id) -> [nutrient_id, nutrient_name, total_in_recipe, units]
         nutr_totals = nutritional_total_recipe(cursor, recipe_id)
         print("-" * 64)
         for i in nutr_totals:
-            print(i[1] + ": " + str(i[2]) + " " + i[3])
+            print(i[1] + ": " + str(round(i[2],2)) + " " + i[3])
+        grams = total_grams(cursor, recipe_id)
+        print("This recipe makes 100")
     else:
         print("**This recipe has no ingredients**")
     print("-"*64)
