@@ -2,57 +2,53 @@ import os
 import sys
 import sqlite3
 
+def q_str(x):
+    return "'" + str(x) + "'"
+
+def q_list(x):
+    ans = "("
+    for i in range(0, len(x)):
+        if (i == len(x) - 1):
+            ans = ans + q_str(x[i]) + ")"
+        else:
+            ans = ans + q_str(x[i]) + ","
+    return ans
+
+#creates a table in meal_planner, optionally from another table
+# create_table(cursor:cursor, table_name:str, fields:tuple_str, from_table_name:str/None, from_table_fields:tuple_str/None)
+def create_table(cursor, table_name, fields, from_table_name, from_table_fields):
+    cursor.execute("drop table if exists " + table_name)
+    cursor.execute("create table " + table_name + q_list(fields))
+    if (from_table_name is not None):
+        cursor.execute("select " + q_list(from_table_fields) + " from " + from_table_name")
+        subcursor = connection.cursor()
+        for i in cursor:
+            subcursor.execute("insert into nutrient(nutrient_id, nutrient_name, units) values " + q_list(i))
+
 database_name = 'meal_planner.db'
-db = sqlite3.connect(database_name)
+connection = sqlite3.connect(database_name)
 
-cursor = db.cursor()
+cursor = connection.cursor()
 
-cursor.execute("attach database 'usda.db' as usda")
+#link usda database
+cursor.execute("attach database 'usda/usda.db' as usda")
+
+#create table nutrient
 cursor.execute("drop table if exists nutrient")
-cursor.execute("create table nutrient(nutrient_id, nutrient_name, units)")
+cursor.execute('''create table nutrient
+(nutrient_id text primary key not null, 
+nutrient_name text not null, 
+units text not null)''')
+
+#populate nutrient with relevant data from usda.nutr_def
 cursor.execute("select Nutr_No, nutrdesc, units from usda.nutr_def")
+subcursor = connection.cursor()
 for i in cursor:
-    print(i)
-    cursor.execute("insert into nutrient(nutrient_id, nutrient_name, units) values ('" + str(i[0]) + "','" + str(i[1]) + "','" + str(i[2]) + "')")
-cursor.execute("select * from nutrient")
-for i in cursor:
-    print(i)
-def insert_row(self, cursor, datatype, fields):
-    # Generate insert parameters string
-    insert_params = "(" + ",".join(['?' for x in fields]) + ")"
-    query = "insert into " + datatype + " values " + insert_params, fields
-    # Execute insert
-    cursor.execute("insert into " + datatype + " values " + insert_params, fields)
+    subcursor.execute("insert into nutrient(nutrient_id, nutrient_name, units) values " + q_list(i))
 
-def refresh(self, filename, datatype):
-    # Init database cursor
-    cursor = self.database.cursor()
 
-    # Refresh the table definition
-    self.create_table(cursor, datatype)
 
-    # Print out which file we are working on
-    sys.stdout.write("Parsing " + filename + '...')
-    sys.stdout.flush()
+connection.commit()
+connection.close()
 
-    # Iterate through each line of the file
-    with open(filename, 'rU') as f:
-        for line in f:
-            # Break up fields using carets, remove whitespace and tilda text field surrounders
-            # We also need to decode the text from the Windows cp1252 encoding used by the USDA files
-            fields = [unicode(field.strip().strip('~')) for field in line.split('^')]
-            # Insert row into database
-            self.insert_row(cursor, datatype, fields)
-
-    # Commit changes to file
-    self.database.commit()
-
-    # Done message
-    print("Done")
-
-def create_table(self, cursor, datatype):
-    """Creates a new table in the database based on the datatype. Drops existing table if there is one."""
-
-    # Create new table
-    cursor.executescript(self.create_table_stmt[datatype])
 
