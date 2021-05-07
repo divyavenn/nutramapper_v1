@@ -40,7 +40,7 @@ def create_table(cursor, table_name, fields, constraints, from_table_name, from_
         cursor.execute(query)
         subcursor = connection.cursor()
         for i in cursor:
-            query = "insert into nutrient ("
+            query = "insert into " + table_name + " ("
             for j in range(0, len(fields)):
                 if j == len(fields) - 1:
                     query = query + fields[j].split()[0]
