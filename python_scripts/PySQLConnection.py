@@ -1,13 +1,13 @@
 from menu import main_menu
 from print_methods import cls
 from recipe import *
-
 #returns connection
 def try_connect():
     cls()
     u_name = input("Please enter your MySQL server username.")
     pword = input("Please enter your MySQL server password.")
-    prt = input("If you have a specific port number in mind, type it in. \nIf not, press enter and we'll assume the default of 3306.")
+    prt = input("If you have a specific port number in mind, type it in. \n" +
+                "If not, press enter and we'll assume the default of 3306.")
     # returns -2 for empty input, -1 for invalid input, 0 for name, 1 for id
     if (input_form(prt) == -2):
         prt = 3306
@@ -45,11 +45,9 @@ def intro():
           "have been imported and that your server is running.")
 
     input("\n \n \n Press any key to continue...")
-
     connection = try_connect()
     cls()
     print("Connection successful! Ready to start?")
-
     input("\n \n \n Press any key to continue...")
     cls()
     return connection
